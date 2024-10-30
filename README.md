@@ -35,7 +35,7 @@ PC Store is a web-based e-commerce application specializing in the sale of compu
 
 ## Project Structure
 
-### Backend (/server)
+### Backend: /server
 
 - `/src/main/java/com/pc/store/server/` - Main source code directory.
 - `/config/ `: Contains Spring Boot configuration files.
@@ -52,7 +52,7 @@ PC Store is a web-based e-commerce application specializing in the sale of compu
 - `/src/test/ `: Unit tests for backend services.
 - `pom.xml`: Maven configuration file for project dependencies.
 
-### Frontend (/client)
+### Frontend: /client
 
 - `/src/components/`: React components for building the UI.
 - `/src/lib/`: Utility functions and helper methods.
