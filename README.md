@@ -181,9 +181,7 @@ PC Store is a web-based e-commerce application specializing in the sale of compu
 | username     | String    | "johndoe"                            | @Size(max=150), @NotNull                                    |
 | first_name   | String    | "John"                               | @Size(max=30)                                               |
 | last_name    | String    | "Doe"                                | @Size(max=30)                                               |
-| phone_number | String    | "0123456789"                         | @Size(max=10), @Pattern(regexp="^\\+?1?\\d{9,15}$", message |
-
-="Phone number is not valid") |
+| phone_number | String    | "0123456789"                         | @Size(max=10), @Pattern(regexp="^\\+?1?\\d{9,15}$", message ="Phone number is not valid") |
 | email | String | "johndoe@example.com" | @Email |
 | password | String | "hashed_password" | @Size(min=8, max=255), @NotNull |
 
