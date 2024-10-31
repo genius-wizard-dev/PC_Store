@@ -114,9 +114,7 @@ PC Store is a web-based e-commerce application specializing in the sale of compu
 | ------ | -------------------- | ---------------------------------------- |
 | GET    | `/api/products`      | Retrieve a list of all products.         |
 | GET    | `/api/products/{id}` | Retrieve details of a specific product.  |
-| POST   | `/api/products`      | Add a new product (Admin only).          |
-| PUT    | `/api/products/{id}` | Update an existing product (Admin only). |
-| DELETE | `/api/products/{id}` | Delete a product (Admin only).           |
+
 
 ### Orders
 
@@ -127,13 +125,13 @@ PC Store is a web-based e-commerce application specializing in the sale of compu
 | POST   | `/api/orders`      | Create a new order.                         |
 | PUT    | `/api/orders/{id}` | Update the status of an order (Admin only). |
 
-### Users
+### Customers
 
 | Method | Endpoint             | Description                        |
 | ------ | -------------------- | ---------------------------------- |
-| POST   | `/api/auth/register` | Register a new user.               |
-| POST   | `/api/auth/login`    | Log in an existing user.           |
-| GET    | `/api/users/profile` | Retrieve user profile information. |
+| POST   | `/api/customers/register` | Register a new user.               |
+| POST   | `/api/customers/login`    | Log in an existing user.           |
+| GET    | `/api/customers/info` | Retrieve user profile information. |
 | PUT    | `/api/users/profile` | Update user profile information.   |
 
 ## Database Models
