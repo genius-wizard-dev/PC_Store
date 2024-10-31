@@ -125,13 +125,13 @@ PC Store is a web-based e-commerce application specializing in the sale of compu
 | POST   | `/api/orders`      | Create a new order.                         |
 | PUT    | `/api/orders/{id}` | Update the status of an order (Admin only). |
 
-### Users
+### Customers
 
 | Method | Endpoint             | Description                        |
 | ------ | -------------------- | ---------------------------------- |
-| POST   | `/api/auth/register` | Register a new user.               |
-| POST   | `/api/auth/login`    | Log in an existing user.           |
-| GET    | `/api/users/profile` | Retrieve user profile information. |
+| POST   | `/api/customers/register` | Register a new user.               |
+| POST   | `/api/customers/login`    | Log in an existing user.           |
+| GET    | `/api/customers/info` | Retrieve user profile information. |
 | PUT    | `/api/users/profile` | Update user profile information.   |
 
 ## Database Models
