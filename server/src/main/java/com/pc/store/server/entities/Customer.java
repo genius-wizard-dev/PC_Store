@@ -1,5 +1,7 @@
 package com.pc.store.server.entities;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import jakarta.validation.constraints.NotNull;
 
 import org.bson.types.ObjectId;
@@ -20,6 +22,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 public class Customer {
     @Id
+    @JsonSerialize(using= ToStringSerializer.class)
     ObjectId id;
 
     @Indexed(unique = true)
