@@ -18,13 +18,16 @@ import org.springframework.security.web.SecurityFilterChain;
 public class MySecurity {
     private final String[] PUBLIC_ENDPOINTS = {
         "/api/customers/register", "/api/auth/log-in", "/api/auth/introspect", "/api/auth/logout", "/api/auth/refresh",
-
     };
     private final String[] PUBLIC_ENDPOINTS_GET = {
-            "/api/products", "/api/products/asc","/api/products/desc",
-            "/api/products/{name}", "/api/product-detail/{id}",
-            "/api/product-detail"
+        "/api/products",
+        "/api/products/asc",
+        "/api/products/desc",
+        "/api/products/{name}",
+        "/api/product-detail/{id}",
+        "/api/product-detail"
     };
+
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
 
@@ -32,7 +35,6 @@ public class MySecurity {
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
     }
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
