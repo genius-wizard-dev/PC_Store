@@ -13,6 +13,9 @@ public enum ErrorCode {
     UNAUTHORIZED(1004, "You do not have permission", HttpStatus.FORBIDDEN),
     INVALID_KEY(1111, "Uncategorized error", HttpStatus.BAD_REQUEST),
     PRODUCT_DETAIL_NOT_FOUND(2001, "Product detail not found", HttpStatus.NOT_FOUND),
+    PRODUCT_NOT_FOUND(2002, "Product not found", HttpStatus.NOT_FOUND),
+    CART_NOT_FOUND(3001, "Cart not found", HttpStatus.NOT_FOUND),
+    CART_ITEM_NOT_FOUND(3002, "Cart item not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatus httpStatus) {

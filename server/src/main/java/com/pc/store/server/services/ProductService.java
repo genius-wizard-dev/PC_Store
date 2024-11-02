@@ -2,6 +2,9 @@ package com.pc.store.server.services;
 
 import java.util.List;
 
+import com.pc.store.server.exception.AppException;
+import com.pc.store.server.exception.ErrorCode;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,5 +47,9 @@ public class ProductService {
     public List<ProductResponse> getProductByName(String name) {
         List<Product> products = productRespository.findByNameContaining(name);
         return products.stream().map(productMapper::toProductResponse).toList();
+    }
+    public ProductResponse getProductById(String id) {
+        Product product = productRespository.findById(new ObjectId(id)).orElseThrow(()-> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        return productMapper.toProductResponse(product);
     }
 }
