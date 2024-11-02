@@ -12,6 +12,7 @@ public enum ErrorCode {
     UNAUTHENTICATED(1003, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1004, "You do not have permission", HttpStatus.FORBIDDEN),
     INVALID_KEY(1111, "Uncategorized error", HttpStatus.BAD_REQUEST),
+    PRODUCT_DETAIL_NOT_FOUND(2001, "Product detail not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatus httpStatus) {
