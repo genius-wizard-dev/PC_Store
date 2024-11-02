@@ -1,21 +1,15 @@
-package com.pc.store.server.entities;
-
+package com.pc.store.server.dto.response;
+import com.pc.store.server.entities.Supplier;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Document(collection = "products")
-public class Product {
-    @Id
-    @Field("_id")
+public class ProductResponse {
     ObjectId id;
     String name;
     String img;

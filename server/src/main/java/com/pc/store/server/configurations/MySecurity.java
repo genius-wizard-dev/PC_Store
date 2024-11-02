@@ -18,8 +18,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class MySecurity {
     private final String[] PUBLIC_ENDPOINTS = {
         "/api/customers/register", "/api/auth/log-in", "/api/auth/introspect", "/api/auth/logout", "/api/auth/refresh",
-    };
 
+    };
+    private final String[] PUBLIC_ENDPOINTS_GET = {
+            "/api/products", "/api/products/asc","/api/products/desc"
+    };
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
 
@@ -32,6 +35,8 @@ public class MySecurity {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(authRes -> authRes.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
+                .permitAll()
+                .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS_GET)
                 .permitAll()
                 .anyRequest()
                 .authenticated());
