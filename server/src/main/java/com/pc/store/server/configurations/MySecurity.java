@@ -21,7 +21,8 @@ public class MySecurity {
 
     };
     private final String[] PUBLIC_ENDPOINTS_GET = {
-            "/api/products", "/api/products/asc","/api/products/desc"
+            "/api/products", "/api/products/asc","/api/products/desc",
+            "api/products/{name}"
     };
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
