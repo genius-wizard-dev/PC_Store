@@ -12,15 +12,15 @@ export const post = async <T>(
   headers?: any
 ): Promise<AxiosResponse<T>> => {
   try {
-      console.log('Calling API:', uri, { data, headers });
+      // console.log('Calling API:', uri, { data, headers });
       const res = await instance.post<T>(uri, data, { headers });
       return res;
   } catch (error: any) {
-      console.error('API Error:', {
-          uri,
-          data,
-          error: error.response?.data || error.message
-      });
+      // console.error('API Error:', {
+      //     uri,
+      //     data,
+      //     error: error.response?.data || error.message
+      // });
       throw error;
   }
 };

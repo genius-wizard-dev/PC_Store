@@ -63,6 +63,9 @@ export const CheckTokenValidResponseSchema = z.object({
   }),
 });
 
+export const LogoutResponseSchema = z.object({
+  code: z.number(),
+});
 
 
 // Xuất kiểu dữ liệu từ schema
@@ -71,3 +74,4 @@ export type LoginResponse = z.infer<typeof LoginResponseSchema>;
 export type RegisterCredentials = z.infer<typeof RegisterCredentialsSchema>;
 export type RegisterResponse = z.infer<typeof RegisterResponseSchema>;
 export type CheckTokenValidResponse = z.infer<typeof CheckTokenValidResponseSchema>;
+export type LogoutResponse = z.infer<typeof LogoutResponseSchema>;

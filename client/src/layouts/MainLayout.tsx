@@ -1,6 +1,6 @@
 import useWindowSize from "@/hooks/useWindowsSize";
+import { Footer, Header } from "@/pages/common";
 import { Outlet } from "react-router-dom";
-// import { Footer, Header } from "../common";
 
 export default function MainLayout() {
   // const [openModal, setOpenModal] = useState<"chat" | "userInfo" | null>(null);
@@ -43,16 +43,16 @@ export default function MainLayout() {
   // }, [openModal]);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* <Header openUserInfo={openUserInfo} className="flex-shrink-0" /> */}
+    <div className="flex flex-col min-h-screen relative justify-center items-center ">
+      <Header />
       <main
-        className={`flex-grow py-16 px-4 md:py-8 md:px-10 ${
+        className={`flex-grow py-16 max-w-[95%]  px-4 w-full md:py-8 md:px-10 mt-[5.25rem] ${
           isMobile ? "mt-[140px]" : ""
         }`}
       >
         <Outlet />
       </main>
-      {/* <Footer className="flex-shrink-0 relative z-30" /> */}
+      <Footer />
     </div>
   );
 }

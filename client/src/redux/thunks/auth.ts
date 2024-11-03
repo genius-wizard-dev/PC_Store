@@ -1,6 +1,6 @@
 import { ENDPOINTS } from "@/constants";
 import { post } from "@/services/api.service";
-import { CheckTokenValidResponse, Credentials, LoginResponse, RegisterCredentials, RegisterResponse } from "@/types/Auth";
+import { CheckTokenValidResponse, Credentials, LoginResponse, LogoutResponse, RegisterCredentials, RegisterResponse } from "@/types/Auth";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 // Thunk để login người dùng
@@ -19,7 +19,7 @@ export const login = createAsyncThunk(
 
       return response.data;
     } catch (error: any) {
-      console.error('Login error:', error.response?.data || error.message);
+      // console.error('Login error:', error.response?.data || error.message);
       return rejectWithValue(
         error.response?.data?.message ||
         'Đăng nhập thất bại, vui lòng thử lại'
@@ -58,6 +58,18 @@ export const checkTokenValid = createAsyncThunk(
         throw new Error('Token không hợp lệ');
       }
 
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const logout = createAsyncThunk(
+  "auth/logout",
+  async (token: string, { rejectWithValue }) => {
+    try {
+      const response = await post<LogoutResponse>(ENDPOINTS.LOGOUT, { token });
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || error.message);

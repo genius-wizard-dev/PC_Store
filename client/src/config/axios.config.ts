@@ -14,13 +14,12 @@ const instance = axios.create({
 instance.interceptors.request.use(
     config => {
         // Log request để debug
-        console.log('Request:', {
-            url: config.url,
-            method: config.method,
-            data: config.data,
-            headers: config.headers
-        });
-
+        // console.log('Request:', {
+        //     url: config.url,
+        //     method: config.method,
+        //     data: config.data,
+        //     headers: config.headers
+        // });
         const token = localStorage.getItem('token');
         if (token && isTokenValid(token)) {
             config.headers['Authorization'] = `Bearer ${token}`;
@@ -39,10 +38,10 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
     response => {
         // Log response để debug
-        console.log('Response:', {
-            status: response.status,
-            data: response.data
-        });
+        // console.log('Response:', {
+        //     status: response.status,
+        //     data: response.data
+        // });
         return response;
     },
     error => {
