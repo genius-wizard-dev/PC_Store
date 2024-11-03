@@ -1,5 +1,7 @@
 package com.pc.store.server.entities;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
@@ -14,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartItem {
 
-
+    @JsonSerialize(using = ToStringSerializer.class)
     ObjectId productId;
 
     int quantity;
