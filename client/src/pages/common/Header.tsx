@@ -100,7 +100,7 @@ export default function Header() {
               </Link>
               <Link
                 className="text-base font-medium hover:text-[#f76808] transition-all hover:scale-110"
-                to="#"
+                to="/product"
               >
                 Products
               </Link>
@@ -160,7 +160,10 @@ export default function Header() {
 
       {showUserModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
-          <div ref={userModalRef} className="bg-white rounded-xl p-8 w-[450px] relative shadow-2xl transform transition-all duration-300 hover:scale-[1.02]">
+          <div
+            ref={userModalRef}
+            className="bg-white rounded-xl p-8 w-[450px] relative shadow-2xl transform transition-all duration-300 hover:scale-[1.02]"
+          >
             <button
               onClick={() => setShowUserModal(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 hover:rotate-90 transition-all duration-300"
@@ -179,22 +182,32 @@ export default function Header() {
 
             <div className="space-y-4 bg-orange-50/50 p-6 rounded-lg">
               <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm">
-                <span className="font-medium text-gray-600 min-w-[120px]">Họ tên:</span>
-                <span className="text-gray-800">{user?.firstName} {user?.lastName}</span>
+                <span className="font-medium text-gray-600 min-w-[120px]">
+                  Họ tên:
+                </span>
+                <span className="text-gray-800">
+                  {user?.firstName} {user?.lastName}
+                </span>
               </div>
 
               <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm">
-                <span className="font-medium text-gray-600 min-w-[120px]">Email:</span>
+                <span className="font-medium text-gray-600 min-w-[120px]">
+                  Email:
+                </span>
                 <span className="text-gray-800">{user?.email}</span>
               </div>
 
               <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm">
-                <span className="font-medium text-gray-600 min-w-[120px]">Số điện thoại:</span>
+                <span className="font-medium text-gray-600 min-w-[120px]">
+                  Số điện thoại:
+                </span>
                 <span className="text-gray-800">{user?.phoneNumber}</span>
               </div>
 
               <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm">
-                <span className="font-medium text-gray-600 min-w-[120px]">Tên đăng nhập:</span>
+                <span className="font-medium text-gray-600 min-w-[120px]">
+                  Tên đăng nhập:
+                </span>
                 <span className="text-gray-800">{user?.userName}</span>
               </div>
             </div>
