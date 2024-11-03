@@ -16,8 +16,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartItem {
 
-    @JsonSerialize(using = ToStringSerializer.class)
-    ObjectId productId;
+
+    Product product;
 
     int quantity;
 

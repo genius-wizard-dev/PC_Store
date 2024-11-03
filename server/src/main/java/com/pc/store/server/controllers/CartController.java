@@ -2,11 +2,16 @@ package com.pc.store.server.controllers;
 
 import com.pc.store.server.dto.request.ApiResponse;
 import com.pc.store.server.entities.Cart;
+import com.pc.store.server.entities.CartItem;
+import com.pc.store.server.entities.Product;
 import com.pc.store.server.services.CartService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.bson.types.ObjectId;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +24,14 @@ public class CartController {
     public ApiResponse<Integer> countOfItems(@RequestParam String customerId){
         var result = cartService.getTotalQuantity(customerId);
         return ApiResponse.<Integer>builder()
+                .result(result)
+                .build();
+    }
+
+    @PostMapping("/createCart/{customerId}")
+    public ApiResponse<Cart> createCart(@PathVariable String customerId){
+        var result = cartService.createNewCart(customerId);
+        return ApiResponse.<Cart>builder()
                 .result(result)
                 .build();
     }
@@ -65,5 +78,19 @@ public class CartController {
                 .result("Cart deleted successfully")
                 .build();
     }
+    @GetMapping("/productIds/{customerId}")
+    public ApiResponse<List<String>> getProductIdsByCustomerId(@PathVariable String customerId) {
+        List<String> productIds = cartService.getProductIdsByCustomerId(new ObjectId(customerId));
+        return ApiResponse.<List<String>>builder()
+                .result(productIds)
+                .build();
+    }
 
+    @GetMapping("/items/{customerId}")
+    public ApiResponse<List<CartItem>> getCartItemsByCustomerId(@PathVariable String customerId) {
+        List<CartItem> cartItems = cartService.getCartItemsByCustomerId(new ObjectId(customerId));
+        return ApiResponse.<List<CartItem>>builder()
+                .result(cartItems)
+                .build();
+    }
 }

@@ -15,6 +15,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -31,14 +33,15 @@ public class MySecurity {
         "/api/product-detail"
     };
 
-    private  final String [] PUBLIC_ENPOINTS_OPTIONS={
+    private  final String [] PUBLIC_ENDPOINTS_OPTIONS={
             "/api/customers/register", "/api/auth/log-in", "/api/auth/introspect", "/api/auth/logout", "/api/auth/refresh",
             "/api/products",
             "/api/products/asc",
             "/api/products/desc",
             "/api/products/{name}",
             "/api/product-detail/{id}",
-            "/api/product-detail"
+            "/api/product-detail",
+            "/api/customers/info"
     };
 
     @Autowired
@@ -55,14 +58,13 @@ public class MySecurity {
                 .permitAll()
                 .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS_GET)
                 .permitAll()
-                .requestMatchers(HttpMethod.OPTIONS, PUBLIC_ENPOINTS_OPTIONS)
-                .permitAll()
+//                .requestMatchers(HttpMethod.OPTIONS, PUBLIC_ENDPOINTS_OPTIONS)
+//                .permitAll()
                 .anyRequest()
                 .authenticated());
         httpSecurity.oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.decoder(customJwtDecoder))
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
-
         return httpSecurity.build();
     }
 
