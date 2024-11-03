@@ -11,6 +11,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -28,6 +31,16 @@ public class MySecurity {
         "/api/product-detail"
     };
 
+    private  final String [] PUBLIC_ENPOINTS_OPTIONS={
+            "/api/customers/register", "/api/auth/log-in", "/api/auth/introspect", "/api/auth/logout", "/api/auth/refresh",
+            "/api/products",
+            "/api/products/asc",
+            "/api/products/desc",
+            "/api/products/{name}",
+            "/api/product-detail/{id}",
+            "/api/product-detail"
+    };
+
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
 
@@ -42,11 +55,15 @@ public class MySecurity {
                 .permitAll()
                 .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS_GET)
                 .permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, PUBLIC_ENPOINTS_OPTIONS)
+                .permitAll()
                 .anyRequest()
                 .authenticated());
         httpSecurity.oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.decoder(customJwtDecoder))
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
+
         return httpSecurity.build();
     }
+
 }
