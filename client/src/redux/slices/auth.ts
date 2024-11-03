@@ -1,9 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CheckTokenValidResponse, LoginResponse } from '../../types/Auth';
-import { checkTokenValid, login } from '../thunks/auth';
+import { CheckTokenValidResponse, LoginResponse, LogoutResponse } from '../../types/Auth';
+import { checkTokenValid, login, logout } from '../thunks/auth';
 
 interface AuthState {
-  user: { id: string } | null;
   token: string | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   isLogin: boolean;
@@ -11,7 +10,6 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  user: null,
   token: localStorage.getItem('token'),
   status: 'idle',
   isLogin: false,
@@ -23,7 +21,6 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
-      state.user = null;
       state.token = null;
       state.status = 'idle';
       state.isLogin = false;
@@ -69,9 +66,25 @@ const authSlice = createSlice({
         state.isLogin = false;
         state.token = null;
         localStorage.removeItem('token');
+      })
+      .addCase(logout.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(logout.fulfilled, (state, action: PayloadAction<LogoutResponse>) => {
+        // console.log("logout", action.payload);
+        if (action.payload.code === 1000) {
+          state.status = 'succeeded';
+          state.isLogin = false;
+          state.token = null;
+          localStorage.removeItem('token');
+        }
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
       });
   },
 });
 
-export const { logout } = authSlice.actions;
+// export const { logout } = authSlice.actions;
 export default authSlice.reducer;

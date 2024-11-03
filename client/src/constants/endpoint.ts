@@ -7,6 +7,9 @@ const ENDPOINT = {
     LOGOUT: `${BASE_URL}/api/auth/logout`,
     REFRESH_TOKEN: `${BASE_URL}/api/auth/refresh`,
     INTROSPECT: `${BASE_URL}/api/auth/introspect`,
+    LIST_PRODUCT: `${BASE_URL}/api/products`,
+    PRODUCT_DETAIL: `${BASE_URL}/api/product-detail`,
+    USER_INFO: `${BASE_URL}/api/customers/info`
 }
 
 export default ENDPOINT;

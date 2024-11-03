@@ -1,4 +1,6 @@
 
 import authReducer from './auth'
+import userReducer from './user'
 
-export {authReducer}
+export { authReducer, userReducer }
+
