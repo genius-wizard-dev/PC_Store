@@ -1,8 +1,12 @@
 import { ENDPOINTS } from "@/constants";
+import { toast } from "@/hooks/use-toast";
+import { RootState } from "@/redux/store";
+import { addToCart, getCartCount } from "@/redux/thunks/cart";
 import { get } from "@/services/api.service";
 import { Product, ProductResponse } from "@/types";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 function ProductPage() {
@@ -10,7 +14,8 @@ function ProductPage() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [sortType, setSortType] = useState<"asc" | "desc" | null>(null);
-
+  const dispatch = useDispatch();
+  const { user } = useSelector((state: RootState) => state.user);
   useEffect(() => {
     const fetchProducts = async () => {
       let url = `${ENDPOINTS.LIST_PRODUCT}?page=${page}`;
@@ -41,6 +46,25 @@ function ProductPage() {
     setPage(0);
   };
 
+  const handleAddCart = async (product: Product) => {
+    try {
+      await dispatch(
+        addToCart({
+          userId: user?.id as string,
+          productId: product.id,
+        }) as any
+      );
+      toast({
+        title: "Thêm vào giỏ hàng thành công",
+      });
+      dispatch(getCartCount(user?.id as string) as any);
+    } catch (error) {
+      toast({
+        title: "Thêm vào giỏ hàng thất bại",
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto px-4">
       <div className="flex justify-end mb-4">
@@ -57,52 +81,61 @@ function ProductPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
         {products.map((product: Product) => (
-          <Link
-            to={`/product/${product.id}`}
+          <div
             key={product.id}
             className="group bg-white border rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
           >
-            <div className="relative">
-              <img
-                src={product.img}
-                alt={product.name}
-                className="w-full h-52 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
-              />
-              <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-sm font-medium">
-                -{product.discountPercent.toFixed(1)}%
-              </div>
-            </div>
-
-            <h3 className="text-lg font-semibold mt-3 line-clamp-2 group-hover:text-orange-600 transition-colors">
-              {product.name}
-            </h3>
-
-            <div className="mt-2 space-y-1">
-              <div className="flex items-baseline gap-2">
-                <span className="text-red-600 font-bold text-xl">
-                  {product.priceAfterDiscount.toLocaleString()}đ
-                </span>
-                <span className="text-gray-400 line-through text-sm">
-                  {product.originalPrice.toLocaleString()}đ
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-3 pt-3 border-t border-gray-100">
-              <div className="text-sm text-gray-600 space-y-1">
-                <div className="flex items-center gap-1">
-                  <span className="font-medium">Nhà cung cấp:</span>
-                  <span>{product.supplier.name}</span>
+            <Link to={`/product/${product.id}`}>
+              <div className="relative">
+                <img
+                  src={product.img}
+                  alt={product.name}
+                  className="w-full h-52 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-sm font-medium">
+                  -{product.discountPercent.toFixed(1)}%
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="font-medium">Địa chỉ:</span>
-                  <span className="line-clamp-1">
-                    {product.supplier.address}
+              </div>
+
+              <h3 className="text-lg font-semibold mt-3 line-clamp-2 group-hover:text-orange-600 transition-colors">
+                {product.name}
+              </h3>
+
+              <div className="mt-2 space-y-1">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-red-600 font-bold text-xl">
+                    {product.priceAfterDiscount.toLocaleString()}đ
+                  </span>
+                  <span className="text-gray-400 line-through text-sm">
+                    {product.originalPrice.toLocaleString()}đ
                   </span>
                 </div>
               </div>
+
+              <div className="mt-3 pt-3 border-t border-gray-100">
+                <div className="text-sm text-gray-600 space-y-1">
+                  <div className="flex items-center gap-1">
+                    <span className="font-medium">Nhà cung cấp:</span>
+                    <span>{product.supplier.name}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="font-medium">Địa chỉ:</span>
+                    <span className="line-clamp-1">
+                      {product.supplier.address}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </Link>
+            <div className="mt-3 flex justify-end">
+              <button
+                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
+                onClick={() => handleAddCart(product)}
+              >
+                Mua ngay
+              </button>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
 

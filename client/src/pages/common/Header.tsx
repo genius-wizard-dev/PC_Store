@@ -1,10 +1,11 @@
 import { useToast } from "@/hooks/use-toast";
+import { clearAllState } from "@/redux/slices";
 import { RootState } from "@/redux/store";
 import { logout } from "@/redux/thunks/auth";
-import { LogIn, Monitor, User, X } from "lucide-react";
+import { LogIn, Monitor, ShoppingCart, User, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Header() {
   const { isLogin, token } = useSelector((state: RootState) => state.auth);
@@ -15,7 +16,8 @@ export default function Header() {
   const userMenuRef = useRef<HTMLDivElement>(null);
   const userModalRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-
+  const { cartCount } = useSelector((state: RootState) => state.cart);
+  const navigate = useNavigate();
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -61,6 +63,8 @@ export default function Header() {
         toast({
           title: "Đăng xuất thành công",
         });
+        dispatch(clearAllState() as any);
+        navigate("/");
       } else {
         toast({
           title: "Đăng xuất thất bại",
@@ -76,14 +80,14 @@ export default function Header() {
   return (
     <>
       <header
-        className="flex justify-center items-center text-white fixed w-full top-5 z-50 shadow-lg max-w-[85%] max-h-16 rounded-full backdrop-blur-md"
+        className="flex justify-center items-center text-white fixed w-full top-5 z-50 shadow-lg max-w-[90%] max-h-16 rounded-full backdrop-blur-md"
         style={{ backgroundColor: "rgba(0,0,0,0.65)" }}
       >
         <div className="container mx-auto px-6 py-4">
           <nav className="flex items-center justify-between">
-            <div className="flex items-center gap-3 hover:scale-105 transition-transform cursor-pointer">
-              <Monitor className="h-7 w-7 text-white" />
-            </div>
+            {/* <div className="w-10 h-10 p-2 rounded-full cursor-pointer hover:ring-2 hover:ring-orange-400 hover:scale-110 transition-all text-white bg-orange-500/20 flex items-center justify-center"> */}
+            <Monitor className="h-7 w-7 text-white cursor-pointer hover:scale-110 transition-all" />
+            {/* </div> */}
 
             <div className="hidden md:flex items-center space-x-10">
               <Link
@@ -119,31 +123,52 @@ export default function Header() {
             </div>
 
             {isLogin ? (
-              <div className="relative" ref={userMenuRef}>
-                <User
-                  className="w-10 h-10 p-2 rounded-full cursor-pointer hover:ring-2 hover:ring-orange-400 hover:scale-110 transition-all text-white bg-orange-500/20"
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                />
-
-                {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <button
-                      onClick={() => {
-                        setShowUserModal(true);
-                        setShowUserMenu(false);
-                      }}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-100 transition-colors duration-200"
-                    >
-                      Thông tin cá nhân
-                    </button>
-                    <button
-                      onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-100 transition-colors duration-200"
-                    >
-                      Đăng xuất
-                    </button>
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <Link
+                    to="/cart"
+                    className={`w-10 h-10  rounded-full cursor-pointer hover:ring-2 hover:ring-orange-400 hover:scale-105 transition-all  ${
+                      cartCount == 0
+                        ? "bg-orange-500/10"
+                        : "bg-gradient-to-br from-orange-400 to-orange-600"
+                    }  flex items-center justify-center shadow-md `}
+                  >
+                    <ShoppingCart className="h-5 w-5 text-white" />
+                  </Link>
+                  {cartCount > 0 && (
+                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-medium rounded-full min-w-[18px] h-[18px] flex items-center justify-center">
+                      {cartCount > 99 ? "99+" : cartCount}
+                    </div>
+                  )}
+                </div>
+                <div className="relative" ref={userMenuRef}>
+                  <div
+                    className="w-10 h-10 p-2 rounded-full cursor-pointer hover:ring-2 hover:ring-orange-400 hover:scale-110 transition-all text-white bg-orange-500/20 flex items-center justify-center"
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                  >
+                    <User className="h-7 w-7 text-white" />
                   </div>
-                )}
+
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <button
+                        onClick={() => {
+                          setShowUserModal(true);
+                          setShowUserMenu(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-100 transition-colors duration-200"
+                      >
+                        Thông tin cá nhân
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-100 transition-colors duration-200"
+                      >
+                        Đăng xuất
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <Link

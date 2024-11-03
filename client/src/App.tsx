@@ -1,34 +1,45 @@
 import MainLayout from "@/layouts/MainLayout";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import PageRender from "./config/routers/PageRender";
 import { Home, Login, Register } from "./pages";
 import { RootState } from "./redux/store";
 import { checkTokenValid } from "./redux/thunks/auth";
+import { getCartCount } from "./redux/thunks/cart";
 import { getUserInfo } from "./redux/thunks/user";
 function App() {
-  const { isLogin, token, status } = useSelector(
-    (state: RootState) => state.auth
-  );
-
+  const { isLogin, token } = useSelector((state: RootState) => state.auth);
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
     const checkAuth = async () => {
-      if (token) {
-        const result = await dispatch(checkTokenValid(token) as any);
-        if (result.payload.result.valid) {
-          await dispatch(getUserInfo() as any);
+      if (!token) return;
+
+      try {
+        setLoading(true);
+        const { payload } = await dispatch(checkTokenValid(token) as any);
+
+        if (payload.result.valid) {
+          const { payload: userPayload } = await dispatch(getUserInfo() as any);
+
+          if (userPayload.result) {
+            await dispatch(getCartCount(userPayload.result.id) as any);
+          }
         }
+      } catch (error) {
+        console.error("Lỗi xác thực:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     checkAuth();
   }, [dispatch, token]);
 
-  if (status === "loading") {
-    return null; // hoặc loading spinner
+  if (loading) {
+    return null;
   }
 
   return (

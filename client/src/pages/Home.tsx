@@ -4,8 +4,7 @@ import { ArrowRight, Cpu, Headphones, Monitor } from "lucide-react";
 
 export default function Home() {
   return (
-    <main className="flex-1">
-      {/* Hero Section */}
+    <main className="flex-1 ">
       <section className="relative h-[90vh] rounded-xl overflow-hidden">
         <img
           src="https://images.unsplash.com/photo-1587202372634-32705e3bf49c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80"
@@ -13,7 +12,7 @@ export default function Home() {
           className="absolute inset-0 w-full h-full object-cover brightness-[0.4]"
         />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white animate-fade-in">
-          <h1 className="mb-8 text-6xl font-bold sm:text-7xl md:text-8xl tracking-tight text-white">
+          <h1 className="mb-8 text-6xl font-bold sm:text-7xl md:text-[5.5rem] tracking-tight text-white">
             Nâng Tầm{" "}
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-orange-600">
               Trải Nghiệm Gaming

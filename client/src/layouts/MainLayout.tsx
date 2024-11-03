@@ -43,10 +43,10 @@ export default function MainLayout() {
   // }, [openModal]);
 
   return (
-    <div className="flex flex-col min-h-screen relative justify-center items-center">
+    <div className="flex flex-col min-h-screen relative justify-center items-center ">
       <Header />
       <main
-        className={`flex-grow py-16 px-4 w-full md:py-8 md:px-10 mt-[5.25rem] ${
+        className={`flex-grow py-16 max-w-[95%]  px-4 w-full md:py-8 md:px-10 mt-[5.25rem] ${
           isMobile ? "mt-[140px]" : ""
         }`}
       >

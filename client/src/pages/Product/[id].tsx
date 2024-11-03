@@ -1,13 +1,18 @@
 import { ENDPOINTS } from "@/constants";
+import { useToast } from "@/hooks/use-toast";
+import { RootState } from "@/redux/store";
+import { addToCart, getCartCount } from "@/redux/thunks/cart";
 import { get } from "@/services/api.service";
 import { ProductDetail } from "@/types";
+import { ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
-
 const Detail = () => {
   const { id } = useParams<{ id: string }>();
   const [productDetail, setProductDetail] = useState<ProductDetail>();
-
+  const { user } = useSelector((state: RootState) => state.user);
+  const { toast } = useToast();
   useEffect(() => {
     const fetchProduct = async () => {
       const response = await get<{ result: ProductDetail }>(
@@ -17,9 +22,26 @@ const Detail = () => {
     };
     fetchProduct();
   }, []);
-
+  const dispatch = useDispatch();
+  const handleAddCart = async () => {
+    try {
+      await dispatch(
+        addToCart({
+          userId: user?.id as string,
+          productId: id as string,
+        }) as any
+      );
+      toast({
+        title: "Thêm vào giỏ hàng thành công",
+      });
+      dispatch(getCartCount(user?.id as string) as any);
+    } catch (error) {
+      toast({
+        title: "Thêm vào giỏ hàng thất bại",
+      });
+    }
+  };
   if (!productDetail) return null;
-  // console.log(productDetail);
   return (
     <div className="container mx-auto px-4 pb-8">
       <div className="flex items-center gap-2 mb-4 text-gray-600">
@@ -120,6 +142,13 @@ const Detail = () => {
                 </div>
               )}
             </div>
+            <button
+              className="flex items-center justify-center gap-2 w-full bg-orange-500 text-white py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors"
+              onClick={handleAddCart}
+            >
+              <ShoppingCart className="w-5 h-5" />
+              Thêm vào giỏ hàng
+            </button>
           </div>
         </div>
       </div>
