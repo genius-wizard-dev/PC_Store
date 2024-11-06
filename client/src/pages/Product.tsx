@@ -7,7 +7,7 @@ import { Product, ProductResponse } from "@/types";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function ProductPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -15,7 +15,9 @@ function ProductPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [sortType, setSortType] = useState<"asc" | "desc" | null>(null);
   const dispatch = useDispatch();
+  const { isLogin, token } = useSelector((state: RootState) => state.auth);
   const { user } = useSelector((state: RootState) => state.user);
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchProducts = async () => {
       let url = `${ENDPOINTS.LIST_PRODUCT}?page=${page}`;
@@ -47,17 +49,30 @@ function ProductPage() {
   };
 
   const handleAddCart = async (product: Product) => {
+    if (!isLogin) {
+      navigate("/login");
+      toast({
+        title: "Vui lòng đăng nhập để thêm vào giỏ hàng",
+      });
+      return;
+    }
     try {
       await dispatch(
         addToCart({
           userId: user?.id as string,
           productId: product.id,
+          token: token as string,
         }) as any
       );
       toast({
         title: "Thêm vào giỏ hàng thành công",
       });
-      dispatch(getCartCount(user?.id as string) as any);
+      dispatch(
+        getCartCount({
+          userId: user?.id as string,
+          token: token as string,
+        }) as any
+      );
     } catch (error) {
       toast({
         title: "Thêm vào giỏ hàng thất bại",
@@ -67,6 +82,13 @@ function ProductPage() {
 
   return (
     <div className="container mx-auto px-4">
+      <div className="flex items-center gap-2 mb-6 text-gray-600">
+        <Link to="/" className="hover:text-orange-500">
+          Trang chủ
+        </Link>
+        <span>/</span>
+        <span className="text-orange-500">Danh sách sản phẩm</span>
+      </div>
       <div className="flex justify-end mb-4">
         <select
           className="px-4 py-2 border rounded-lg bg-white shadow-sm"

@@ -1,6 +1,8 @@
-export type LoadingState = 'idle' | 'loading' | 'succeeded' | 'failed';
-
 export interface BaseState {
-  status: LoadingState;
+  status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
+}
+
+export interface AsyncState<T> extends BaseState {
+  data: T | null;
 }

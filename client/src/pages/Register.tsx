@@ -6,7 +6,7 @@ import { RootState } from "@/redux/store";
 import { register } from "@/redux/thunks/auth";
 import { Auth } from "@/types";
 import { RegisterCredentialsSchema } from "@/types/Auth";
-import { Loader2, Monitor } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -64,24 +64,30 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <div className="flex flex-col items-center gap-6">
-          <div className="flex items-center gap-2">
-            <Monitor className="h-6 w-6 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">PC Store</h1>
-          </div>
+    <div className="h-screen flex items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200">
+      <div className="bg-white/90 backdrop-blur-sm p-6 rounded-2xl shadow-lg w-full max-w-md border border-gray-200 relative">
+        <Link
+          to="/"
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100/50 group transition-colors"
+        >
+          <X className="h-6 w-6 text-gray-500 group-hover:rotate-90 transition-transform" />
+        </Link>
 
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-semibold tracking-tight">Đăng ký</h2>
-            <p className="text-sm text-muted-foreground">
+        <div className="flex flex-col items-center gap-4">
+          <div className="text-center space-y-1">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent">
+             Đăng ký ngay
+            </h1>
+            <p className="text-sm text-gray-600">
               Nhập thông tin đăng ký của bạn để tạo tài khoản
             </p>
           </div>
 
           <form onSubmit={handleRegister} className="w-full space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="username">Tên đăng nhập</Label>
+            <div className="space-y-1">
+              <Label htmlFor="username" className="text-gray-700 text-sm">
+                Tên đăng nhập
+              </Label>
               <Input
                 id="username"
                 type="text"
@@ -93,11 +99,14 @@ export default function Register() {
                     userName: e.target.value,
                   })
                 }
+                className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 h-9"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Mật khẩu</Label>
+            <div className="space-y-1">
+              <Label htmlFor="password" className="text-gray-700 text-sm">
+                Mật khẩu
+              </Label>
               <Input
                 id="password"
                 type="password"
@@ -109,12 +118,15 @@ export default function Register() {
                     password: e.target.value,
                   })
                 }
+                className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 h-9"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">Họ</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label htmlFor="firstName" className="text-gray-700 text-sm">
+                  Họ
+                </Label>
                 <Input
                   id="firstName"
                   type="text"
@@ -126,11 +138,14 @@ export default function Register() {
                       firstName: e.target.value,
                     })
                   }
+                  className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 h-9"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Tên</Label>
+              <div className="space-y-1">
+                <Label htmlFor="lastName" className="text-gray-700 text-sm">
+                  Tên
+                </Label>
                 <Input
                   id="lastName"
                   type="text"
@@ -142,12 +157,15 @@ export default function Register() {
                       lastName: e.target.value,
                     })
                   }
+                  className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 h-9"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+            <div className="space-y-1">
+              <Label htmlFor="email" className="text-gray-700 text-sm">
+                Email
+              </Label>
               <Input
                 id="email"
                 type="email"
@@ -159,11 +177,14 @@ export default function Register() {
                     email: e.target.value,
                   })
                 }
+                className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 h-9"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="phoneNumber">Số điện thoại</Label>
+            <div className="space-y-1">
+              <Label htmlFor="phoneNumber" className="text-gray-700 text-sm">
+                Số điện thoại
+              </Label>
               <Input
                 id="phoneNumber"
                 type="tel"
@@ -175,13 +196,14 @@ export default function Register() {
                     phoneNumber: e.target.value,
                   })
                 }
+                className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 h-9"
               />
             </div>
 
             <Button
               disabled={status === "loading"}
               type="submit"
-              className="w-full"
+              className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold h-9"
             >
               {status === "loading" ? (
                 <>
@@ -197,7 +219,7 @@ export default function Register() {
               Đã có tài khoản?{" "}
               <Link
                 to="/login"
-                className="font-medium text-blue-600 hover:underline"
+                className="font-medium text-orange-500 hover:text-orange-600 transition-colors"
               >
                 Đăng nhập ngay
               </Link>

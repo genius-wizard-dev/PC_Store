@@ -13,11 +13,27 @@ export default function Header() {
   const dispatch = useDispatch();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
   const userMenuRef = useRef<HTMLDivElement>(null);
   const userModalRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { cartCount } = useSelector((state: RootState) => state.cart);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -76,93 +92,140 @@ export default function Header() {
       });
     }
   };
-
+  const handleOrderList = () => {
+    setShowUserMenu(false);
+    navigate("/order");
+  };
   return (
     <>
       <header
-        className="flex justify-center items-center text-white fixed w-full top-5 z-50 shadow-lg max-w-[90%] max-h-16 rounded-full backdrop-blur-md"
-        style={{ backgroundColor: "rgba(0,0,0,0.65)" }}
+        className={`flex justify-center items-center text-white fixed w-[90%] sm:w-[95%] top-5 z-50 max-h-16 rounded-full backdrop-blur-md left-1/2 -translate-x-1/2 transition-all duration-500  bg-black/70`}
+        style={{
+          boxShadow: isScrolled
+            ? `
+            0 0 40px rgba(251,146,60,0.6),
+            inset 0 0 40px rgba(251,146,60,0.3),
+            0 0 80px rgba(251,146,60,0.2),
+            0 0 120px rgba(251,146,60,0.15),
+            0 0 160px rgba(251,146,60,0.1)
+          `
+            : "none",
+          border: isScrolled ? `1px solid rgba(251,146,60,0.4)` : "none",
+          backgroundImage: isScrolled
+            ? `linear-gradient(135deg,
+              rgba(251,146,60,0.18) 0%,
+              rgba(225,29,72,0.18) 25%,
+              rgba(147,51,234,0.18) 50%,
+              rgba(225,29,72,0.18) 75%,
+              rgba(251,146,60,0.18) 100%
+            )`
+            : "none",
+          animation: isScrolled
+            ? "pulseGlow 2s ease-in-out infinite, gradientShift 6s linear infinite, shimmer 3s linear infinite"
+            : "none",
+          backdropFilter: isScrolled ? "blur(16px)" : "blur(8px)",
+          WebkitBackdropFilter: isScrolled ? "blur(16px)" : "blur(8px)",
+          transform: "translateX(-50%)",
+          transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
       >
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-3 sm:px-6 py-4">
           <nav className="flex items-center justify-between">
-            {/* <div className="w-10 h-10 p-2 rounded-full cursor-pointer hover:ring-2 hover:ring-orange-400 hover:scale-110 transition-all text-white bg-orange-500/20 flex items-center justify-center"> */}
-            <Monitor className="h-7 w-7 text-white cursor-pointer hover:scale-110 transition-all" />
-            {/* </div> */}
+            <Monitor className="h-6 w-6 sm:h-7 sm:w-7 text-white cursor-pointer hover:scale-110 transition-all" />
 
-            <div className="hidden md:flex items-center space-x-10">
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center space-x-6 lg:space-x-10">
               <Link
-                className="text-base font-medium hover:text-[#f76808] transition-all hover:scale-110"
+                className="text-sm lg:text-base font-medium hover:text-[#f76808] transition-all hover:scale-110"
                 to="/"
               >
                 Home
               </Link>
               <Link
-                className="text-base font-medium hover:text-[#f76808] transition-all hover:scale-110"
-                to="#"
+                className="text-sm lg:text-base font-medium hover:text-[#f76808] transition-all hover:scale-110"
+                to="/about"
               >
                 About
               </Link>
               <Link
-                className="text-base font-medium hover:text-[#f76808] transition-all hover:scale-110"
+                className="text-sm lg:text-base font-medium hover:text-[#f76808] transition-all hover:scale-110"
                 to="/product"
               >
                 Products
               </Link>
               <Link
-                className="text-base font-medium hover:text-[#f76808] transition-all hover:scale-110"
-                to="#"
-              >
-                Support
-              </Link>
-              <Link
-                className="text-base font-medium hover:text-[#f76808] transition-all hover:scale-110"
+                className="text-sm lg:text-base font-medium hover:text-[#f76808] transition-all hover:scale-110"
                 to="#"
               >
                 Contact
               </Link>
             </div>
 
+            {/* Mobile Menu */}
+            <div className="md:hidden flex items-center space-x-4">
+              <Link
+                className="text-sm font-medium hover:text-[#f76808] transition-all"
+                to="/"
+              >
+                Home
+              </Link>
+              <Link
+                className="text-sm font-medium hover:text-[#f76808] transition-all"
+                to="/product"
+              >
+                Products
+              </Link>
+            </div>
+
             {isLogin ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4">
                 <div className="relative">
                   <Link
                     to="/cart"
-                    className={`w-10 h-10  rounded-full cursor-pointer hover:ring-2 hover:ring-orange-400 hover:scale-105 transition-all  ${
+                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full cursor-pointer hover:ring-2 hover:ring-orange-400 hover:scale-105 transition-all ${
                       cartCount == 0
                         ? "bg-orange-500/10"
                         : "bg-gradient-to-br from-orange-400 to-orange-600"
-                    }  flex items-center justify-center shadow-md `}
+                    } flex items-center justify-center shadow-md`}
                   >
-                    <ShoppingCart className="h-5 w-5 text-white" />
+                    <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                   </Link>
                   {cartCount > 0 && (
-                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-medium rounded-full min-w-[18px] h-[18px] flex items-center justify-center">
+                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] sm:text-[10px] font-medium rounded-full min-w-[16px] sm:min-w-[18px] h-[16px] sm:h-[18px] flex items-center justify-center">
                       {cartCount > 99 ? "99+" : cartCount}
                     </div>
                   )}
                 </div>
                 <div className="relative" ref={userMenuRef}>
                   <div
-                    className="w-10 h-10 p-2 rounded-full cursor-pointer hover:ring-2 hover:ring-orange-400 hover:scale-110 transition-all text-white bg-orange-500/20 flex items-center justify-center"
+                    className="w-8 h-8 sm:w-10 sm:h-10 p-1.5 sm:p-2 rounded-full cursor-pointer hover:ring-2 hover:ring-orange-400 hover:scale-110 transition-all text-white bg-orange-500/20 flex items-center justify-center"
                     onClick={() => setShowUserMenu(!showUserMenu)}
                   >
-                    <User className="h-7 w-7 text-white" />
+                    <User className="h-5 w-5 sm:h-7 sm:w-7 text-white" />
                   </div>
 
                   {showUserMenu && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="absolute right-0 mt-2 w-40 sm:w-48 bg-white rounded-md shadow-lg py-1 animate-in fade-in slide-in-from-top-2 duration-300">
                       <button
                         onClick={() => {
                           setShowUserModal(true);
                           setShowUserMenu(false);
                         }}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-100 transition-colors duration-200"
+                        className="block w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-orange-100 transition-colors duration-200"
                       >
                         Thông tin cá nhân
                       </button>
                       <button
+                        onClick={() => {
+                          handleOrderList();
+                        }}
+                        className="block w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-orange-100 transition-colors duration-200"
+                      >
+                        Lịch sử mua hàng
+                      </button>
+                      <button
                         onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-100 transition-colors duration-200"
+                        className="block w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-orange-100 transition-colors duration-200"
                       >
                         Đăng xuất
                       </button>
@@ -173,10 +236,28 @@ export default function Header() {
             ) : (
               <Link
                 to="/login"
-                className="px-4 py-2 text-white bg-gradient-to-r from-orange-500 to-orange-600 rounded-md hover:from-orange-600 hover:to-orange-700 active:from-orange-700 active:to-orange-800 transform hover:scale-105 active:scale-95 transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2"
+                className={`${
+                  isScrolled
+                    ? "px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base gap-1.5 sm:gap-2"
+                    : "p-2.5 sm:p-3"
+                } text-white rounded-md flex items-center group relative`}
               >
-                <LogIn className="w-5 h-5" />
-                <span>Đăng nhập</span>
+                <LogIn
+                  className={`${
+                    isScrolled
+                      ? "w-4 h-4 sm:w-5 sm:h-5"
+                      : "w-5 h-5 sm:w-6 sm:h-6"
+                  }`}
+                />
+                {isScrolled ? (
+                  <span>Đăng nhập</span>
+                ) : (
+                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-8">
+                    <span className="bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-200">
+                      Đăng nhập
+                    </span>
+                  </div>
+                )}
               </Link>
             )}
           </nav>
@@ -184,56 +265,62 @@ export default function Header() {
       </header>
 
       {showUserModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm p-4">
           <div
             ref={userModalRef}
-            className="bg-white rounded-xl p-8 w-[450px] relative shadow-2xl transform transition-all duration-300 hover:scale-[1.02]"
+            className="bg-white rounded-xl p-4 sm:p-8 w-full max-w-[450px] relative shadow-2xl transform transition-all duration-300 hover:scale-[1.02]"
           >
             <button
               onClick={() => setShowUserModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 hover:rotate-90 transition-all duration-300"
+              className="absolute top-2 sm:top-4 right-2 sm:right-4 text-gray-400 hover:text-gray-600 hover:rotate-90 transition-all duration-300"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
 
-            <div className="text-center mb-6">
-              <div className="bg-orange-500/10 w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <User className="w-8 h-8 text-orange-500" />
+            <div className="text-center mb-4 sm:mb-6">
+              <div className="bg-orange-500/10 w-12 h-12 sm:w-16 sm:h-16 rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center">
+                <User className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                 Thông tin người dùng
               </h2>
             </div>
 
-            <div className="space-y-4 bg-orange-50/50 p-6 rounded-lg">
-              <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm">
-                <span className="font-medium text-gray-600 min-w-[120px]">
+            <div className="space-y-3 sm:space-y-4 bg-orange-50/50 p-4 sm:p-6 rounded-lg">
+              <div className="grid grid-cols-[100px,1fr] sm:grid-cols-[120px,1fr] items-center p-2 sm:p-3 bg-white rounded-lg shadow-sm">
+                <span className="font-medium text-gray-600 text-sm sm:text-base">
                   Họ tên:
                 </span>
-                <span className="text-gray-800">
+                <span className="text-gray-800 break-words text-sm sm:text-base">
                   {user?.firstName} {user?.lastName}
                 </span>
               </div>
 
-              <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm">
-                <span className="font-medium text-gray-600 min-w-[120px]">
+              <div className="grid grid-cols-[100px,1fr] sm:grid-cols-[120px,1fr] items-center p-2 sm:p-3 bg-white rounded-lg shadow-sm">
+                <span className="font-medium text-gray-600 text-sm sm:text-base">
                   Email:
                 </span>
-                <span className="text-gray-800">{user?.email}</span>
+                <span className="text-gray-800 break-all text-sm sm:text-base">
+                  {user?.email}
+                </span>
               </div>
 
-              <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm">
-                <span className="font-medium text-gray-600 min-w-[120px]">
+              <div className="grid grid-cols-[100px,1fr] sm:grid-cols-[120px,1fr] items-center p-2 sm:p-3 bg-white rounded-lg shadow-sm">
+                <span className="font-medium text-gray-600 text-sm sm:text-base">
                   Số điện thoại:
                 </span>
-                <span className="text-gray-800">{user?.phoneNumber}</span>
+                <span className="text-gray-800 break-words text-sm sm:text-base">
+                  {user?.phoneNumber}
+                </span>
               </div>
 
-              <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm">
-                <span className="font-medium text-gray-600 min-w-[120px]">
+              <div className="grid grid-cols-[100px,1fr] sm:grid-cols-[120px,1fr] items-center p-2 sm:p-3 bg-white rounded-lg shadow-sm">
+                <span className="font-medium text-gray-600 text-sm sm:text-base">
                   Tên đăng nhập:
                 </span>
-                <span className="text-gray-800">{user?.userName}</span>
+                <span className="text-gray-800 break-words text-sm sm:text-base">
+                  {user?.userName}
+                </span>
               </div>
             </div>
           </div>

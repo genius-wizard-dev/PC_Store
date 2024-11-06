@@ -7,12 +7,16 @@ import { ProductDetail } from "@/types";
 import { ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+
 const Detail = () => {
   const { id } = useParams<{ id: string }>();
   const [productDetail, setProductDetail] = useState<ProductDetail>();
   const { user } = useSelector((state: RootState) => state.user);
+  const { isLogin, token } = useSelector((state: RootState) => state.auth);
   const { toast } = useToast();
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchProduct = async () => {
       const response = await get<{ result: ProductDetail }>(
@@ -22,25 +26,37 @@ const Detail = () => {
     };
     fetchProduct();
   }, []);
+
   const dispatch = useDispatch();
+
   const handleAddCart = async () => {
+    if (!isLogin) {
+      navigate("/login");
+      toast({
+        title: "Vui lòng đăng nhập để thêm vào giỏ hàng",
+      });
+      return;
+    }
+
     try {
       await dispatch(
         addToCart({
           userId: user?.id as string,
           productId: id as string,
+          token: token as string,
         }) as any
       );
       toast({
         title: "Thêm vào giỏ hàng thành công",
       });
-      dispatch(getCartCount(user?.id as string) as any);
+      dispatch(getCartCount({ userId: user?.id as string, token: token as string }) as any);
     } catch (error) {
       toast({
         title: "Thêm vào giỏ hàng thất bại",
       });
     }
   };
+
   if (!productDetail) return null;
   return (
     <div className="container mx-auto px-4 pb-8">
