@@ -153,12 +153,6 @@ export default function Header() {
               >
                 Products
               </Link>
-              <Link
-                className="text-sm lg:text-base font-medium hover:text-[#f76808] transition-all hover:scale-110"
-                to="#"
-              >
-                Contact
-              </Link>
             </div>
 
             {/* Mobile Menu */}

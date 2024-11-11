@@ -1,16 +1,51 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import ENDPOINT from "@/constants/endpoint";
+import { useToast } from "@/hooks";
 import { RootState } from "@/redux/store";
+import { viewOrder } from "@/redux/thunks/order";
+import { put } from "@/services/api.service";
 import { Package2, Phone, Truck, User, XCircle } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
-
 function OrderDetail() {
+  const dispatch = useDispatch();
   const { id } = useParams<{ id: string }>();
   const { orders } = useSelector((state: RootState) => state.order);
+  const { token } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.user);
   const order = orders.find((order) => order.id === id);
-
+  const { toast } = useToast();
+  const handleAcceptOrder = async () => {
+    try {
+      const result = await put<any>(
+        `${ENDPOINT.ORDER}/${id}?status=DELIVERED`,
+        {},
+        token as string
+      );
+      if (result.data.code === 1000) {
+        toast({
+          title: "Cập nhật thành công",
+        });
+        dispatch(
+          viewOrder({
+            userId: user?.id as string,
+            token: token as string,
+          }) as any
+        );
+      } else {
+        toast({
+          title: "Cập nhật thất bại",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Hết phiên đăng nhập vui lòng đăng nhập lại",
+        variant: "destructive",
+      });
+    }
+  };
   if (!order) return null;
-
   return (
     <div className="container mx-auto p-6">
       <div className="flex items-center gap-2 mb-6 text-gray-600">
@@ -103,6 +138,14 @@ function OrderDetail() {
                 </div>
               </div>
             </div>
+            {order.orderStatus === "DELIVERING" && (
+              <button
+                onClick={handleAcceptOrder}
+                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              >
+                Đã nhận hàng
+              </button>
+            )}
           </CardHeader>
 
           <CardContent className="pt-6">
