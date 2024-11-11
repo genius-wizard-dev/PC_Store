@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RootState } from "@/redux/store";
-import { Package, Truck, User } from "lucide-react";
+import { MapPin, Package, Truck, User, XCircle } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -21,14 +21,41 @@ function Order() {
       </h1>
 
       <div className="grid gap-6">
-        {orders.map((order, index) => (
+        {orders.map((order: any, index) => (
           <Link key={order.id} to={`/order/${order.id}`}>
             <Card className="hover:bg-gray-50 transition-all duration-300 border border-gray-200">
               <CardHeader className="border-b border-gray-100">
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-xl font-medium text-gray-800">
-                    Đơn hàng #{index + 1}
-                  </CardTitle>
+                  <div className="flex items-center gap-4">
+                    <CardTitle className="text-xl font-medium text-gray-800">
+                      Đơn hàng #{index + 1}
+                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      {order.orderStatus === "DELIVERING" && (
+                        <Truck className="h-4 w-4 text-blue-500" />
+                      )}
+                      {order.orderStatus === "DELIVERED" && (
+                        <Package className="h-4 w-4 text-green-500" />
+                      )}
+                      {order.orderStatus === "CANCELLED" && (
+                        <XCircle className="h-4 w-4 text-red-500" />
+                      )}
+                      <span
+                        className={`
+            px-2 py-1 rounded-full text-xs font-medium
+            ${order.orderStatus === "DELIVERING" && "bg-blue-100 text-blue-700"}
+            ${
+              order.orderStatus === "DELIVERED" && "bg-green-100 text-green-700"
+            }
+            ${order.orderStatus === "CANCELLED" && "bg-red-100 text-red-700"}
+              `}
+                      >
+                        {order.orderStatus === "DELIVERING" && "Đang giao hàng"}
+                        {order.orderStatus === "DELIVERED" && "Đã giao hàng"}
+                        {order.orderStatus === "CANCELLED" && "Đã hủy"}
+                      </span>
+                    </div>
+                  </div>
                   <div className="text-lg font-semibold text-primary">
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
@@ -37,16 +64,19 @@ function Order() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-6 text-gray-600 mt-3">
+                <div className="flex gap-4 mt-4 text-gray-600">
                   <div className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
+                    <User className="h-4 w-4 text-blue-500" />
                     <span className="text-sm">
                       {order.customer.firstName} {order.customer.lastName}
                     </span>
                   </div>
+
                   <div className="flex items-center gap-2">
-                    <Truck className="h-4 w-4" />
-                    <span className="text-sm">{order.shipAddress}</span>
+                    <MapPin className="h-4 w-4 text-purple-500" />
+                    <span className="text-sm truncate max-w-[300px]">
+                      {order.shipAddress}
+                    </span>
                   </div>
                 </div>
               </CardHeader>

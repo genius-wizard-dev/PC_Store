@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RootState } from "@/redux/store";
-import { Package2, Phone, Truck, User } from "lucide-react";
+import { Package2, Phone, Truck, User, XCircle } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 
@@ -48,6 +48,41 @@ function OrderDetail() {
                   <div className="text-sm font-medium">Khách hàng</div>
                   <div className="text-sm">
                     {order.customer.firstName} {order.customer.lastName}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 bg-white p-3 rounded-lg">
+                <div className="flex items-center gap-2">
+                  {order.orderStatus === "DELIVERING" && (
+                    <Truck className="h-5 w-5 text-blue-500" />
+                  )}
+                  {order.orderStatus === "DELIVERED" && (
+                    <Package2 className="h-5 w-5 text-green-500" />
+                  )}
+                  {order.orderStatus === "CANCELLED" && (
+                    <XCircle className="h-5 w-5 text-red-500" />
+                  )}
+                  <div
+                    className={`
+                  px-3 py-1 rounded-full text-sm font-medium
+                  ${
+                    order.orderStatus === "DELIVERING" &&
+                    "bg-blue-100 text-blue-700"
+                  }
+                  ${
+                    order.orderStatus === "DELIVERED" &&
+                    "bg-green-100 text-green-700"
+                  }
+                  ${
+                    order.orderStatus === "CANCELLED" &&
+                    "bg-red-100 text-red-700"
+                  }
+                  `}
+                  >
+                    {order.orderStatus === "DELIVERING" && "Đang giao hàng"}
+                    {order.orderStatus === "DELIVERED" && "Đã giao hàng"}
+                    {order.orderStatus === "CANCELLED" && "Đã hủy"}
                   </div>
                 </div>
               </div>

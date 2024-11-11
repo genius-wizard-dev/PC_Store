@@ -9,6 +9,7 @@ export interface Result {
   shipAddress: string;
   items:       Item[];
   totalPrice:  number;
+  orderStatus: string
 }
 
 export interface Customer {

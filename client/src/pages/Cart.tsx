@@ -164,6 +164,7 @@ function Cart() {
           shipAddress: address,
           items,
           totalPrice,
+          orderStatus: "DELIVERING",
         },
         token as string
       );
