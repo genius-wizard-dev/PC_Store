@@ -11,8 +11,8 @@ import org.springframework.stereotype.Repository;
 import com.pc.store.server.entities.Product;
 
 @Repository
-public interface ProductRespository extends MongoRepository<Product, ObjectId> {
+public interface ProductRepository extends MongoRepository<Product, ObjectId> {
     Page<Product> findAllBy(Pageable pageable);
 
-    List<Product> findByNameContaining(String name);
+    Page<Product> findByNameContaining(String name, Pageable pageable);
 }

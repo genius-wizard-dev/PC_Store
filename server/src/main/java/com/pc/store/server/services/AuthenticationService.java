@@ -16,8 +16,8 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import com.pc.store.server.dao.CustomerRespository;
-import com.pc.store.server.dao.InvalidatedTokenRespository;
+import com.pc.store.server.dao.CustomerRepository;
+import com.pc.store.server.dao.InvalidatedTokenRepository;
 import com.pc.store.server.dto.request.IntrospectRequest;
 import com.pc.store.server.dto.request.LogoutRequest;
 import com.pc.store.server.dto.request.RefreshRequest;
@@ -39,9 +39,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationService {
-    CustomerRespository customerRespository;
+    CustomerRepository customerRespository;
 
-    InvalidatedTokenRespository invalidatedTokenRespository;
+    InvalidatedTokenRepository invalidatedTokenRespository;
 
     @NonFinal
     @Value("${jwt.expireDuration}")

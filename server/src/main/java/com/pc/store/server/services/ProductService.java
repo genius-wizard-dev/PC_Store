@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.pc.store.server.dao.ProductRespository;
+import com.pc.store.server.dao.ProductRepository;
 import com.pc.store.server.dto.response.ProductResponse;
 import com.pc.store.server.entities.Product;
 import com.pc.store.server.mapper.ProductMapper;
@@ -24,7 +24,7 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor
 public class ProductService {
 
-    ProductRespository productRespository;
+    ProductRepository productRespository;
     ProductMapper productMapper;
 
     public Page<Product> getProductsByPage(int page, int size) {
@@ -44,9 +44,9 @@ public class ProductService {
         return productRespository.findAllBy(pageable);
     }
 
-    public List<ProductResponse> getProductByName(String name) {
-        List<Product> products = productRespository.findByNameContaining(name);
-        return products.stream().map(productMapper::toProductResponse).toList();
+    public Page<Product> getProductByName(String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return productRespository.findByNameContaining(name, pageable);
     }
     public ProductResponse getProductById(String id) {
         Product product = productRespository.findById(new ObjectId(id)).orElseThrow(()-> new AppException(ErrorCode.PRODUCT_NOT_FOUND));

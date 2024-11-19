@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,6 +21,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@EnableAsync
 public class MySecurity {
     private final String[] PUBLIC_ENDPOINTS = {
         "/api/customers/register", "/api/auth/log-in", "/api/auth/introspect", "/api/auth/logout", "/api/auth/refresh",
@@ -30,7 +32,8 @@ public class MySecurity {
         "/api/products/desc",
         "/api/products/{name}",
         "/api/product-detail/{id}",
-        "/api/product-detail"
+        "/api/product-detail",
+        "/api/payment/create_payment",
     };
 
     private  final String [] PUBLIC_ENDPOINTS_OPTIONS={
@@ -46,6 +49,8 @@ public class MySecurity {
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
+
+
 
     @Bean
     PasswordEncoder passwordEncoder() {

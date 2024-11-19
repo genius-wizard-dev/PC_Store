@@ -4,4 +4,4 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.pc.store.server.entities.InvalidatedToken;
 
-public interface InvalidatedTokenRespository extends MongoRepository<InvalidatedToken, String> {}
+public interface InvalidatedTokenRepository extends MongoRepository<InvalidatedToken, String> {}

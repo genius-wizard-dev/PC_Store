@@ -1,8 +1,8 @@
 package com.pc.store.server.services;
 
 import com.pc.store.server.dao.CartRepository;
-import com.pc.store.server.dao.CustomerRespository;
-import com.pc.store.server.dao.ProductRespository;
+import com.pc.store.server.dao.CustomerRepository;
+import com.pc.store.server.dao.ProductRepository;
 import com.pc.store.server.entities.Cart;
 import com.pc.store.server.entities.CartItem;
 import com.pc.store.server.entities.Customer;
@@ -24,9 +24,9 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class CartService {
-    CustomerRespository customerRespository;
+    CustomerRepository customerRespository;
     CartRepository cartRepository;
-    ProductRespository productRespository;
+    ProductRepository productRespository;
     public int getTotalQuantity(String customerId) {
         // Tìm Cart dựa trên customerId
         Cart cart = cartRepository.findByCustomerId(new ObjectId(customerId))
