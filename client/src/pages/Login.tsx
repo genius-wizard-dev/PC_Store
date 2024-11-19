@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { login } from "@/redux/thunks/auth";
 import { Auth } from "@/types";
 import { CredentialsSchema } from "@/types/Auth";
-import { Loader2, Monitor } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -65,24 +64,29 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200">
+      <div className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-lg w-full max-w-md border border-gray-200 relative">
+        <Link
+          to="/"
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100/50 group transition-colors"
+        >
+          <X className="h-6 w-6 text-gray-500 group-hover:rotate-90 transition-transform" />
+        </Link>
         <div className="flex flex-col items-center gap-6">
-          <div className="flex items-center gap-2">
-            <Monitor className="h-6 w-6 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">PC Store</h1>
-          </div>
-
           <div className="text-center space-y-2">
-            <h2 className="text-3xl font-semibold tracking-tight">Đăng nhập</h2>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent">
+              Đăng nhập
+            </h1>
+            <p className="text-gray-600">
               Nhập thông tin đăng nhập của bạn để tiếp tục
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="w-full space-y-4">
+          <form onSubmit={handleLogin} className="w-full space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="username">Tên đăng nhập</Label>
+              <Label htmlFor="username" className="text-gray-700">
+                Tên đăng nhập
+              </Label>
               <Input
                 id="username"
                 type="text"
@@ -91,11 +95,13 @@ function Login() {
                 onChange={(e) =>
                   setCredentials({ ...credentials, userName: e.target.value })
                 }
+                className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
               />
             </div>
-
             <div className="space-y-2">
-              <Label htmlFor="password">Mật khẩu</Label>
+              <Label htmlFor="password" className="text-gray-700">
+                Mật khẩu
+              </Label>
               <Input
                 id="password"
                 type="password"
@@ -104,28 +110,15 @@ function Login() {
                 onChange={(e) =>
                   setCredentials({ ...credentials, password: e.target.value })
                 }
+                className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Checkbox id="remember" />
-                <label
-                  htmlFor="remember"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Ghi nhớ đăng nhập
-                </label>
-              </div>
-              <Link
-                to="/forgot-password"
-                className="text-sm font-medium text-blue-600 hover:underline"
-              >
-                Quên mật khẩu?
-              </Link>
-            </div>
-
-            <Button disabled={isLoading} type="submit" className="w-full">
+            <Button
+              disabled={isLoading}
+              type="submit"
+              className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold py-6"
+            >
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -135,12 +128,11 @@ function Login() {
                 "Đăng nhập"
               )}
             </Button>
-
             <p className="text-center text-sm text-gray-600">
               Chưa có tài khoản?{" "}
               <Link
                 to="/register"
-                className="font-medium text-blue-600 hover:underline"
+                className="font-medium text-orange-500 hover:text-orange-600 transition-colors"
               >
                 Đăng ký ngay
               </Link>

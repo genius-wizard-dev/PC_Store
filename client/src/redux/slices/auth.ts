@@ -1,7 +1,7 @@
+import { BaseState } from '@/types/store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CheckTokenValidResponse, LoginResponse, LogoutResponse } from '../../types/Auth';
 import { checkTokenValid, login, logout } from '../thunks/auth';
-import { BaseState } from '@/types/store';
 
 interface AuthState extends BaseState {
   token: string | null;
@@ -45,12 +45,21 @@ const authSlice = createSlice({
         state.error = action.payload as string;
         clearAuthState(state);
       })
+      .addCase(checkTokenValid.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
       .addCase(checkTokenValid.fulfilled, (state, action: PayloadAction<CheckTokenValidResponse>) => {
         state.status = 'succeeded';
         state.isLogin = action.payload.result.valid;
         if (!action.payload.result.valid) {
           clearAuthState(state);
         }
+      })
+      .addCase(checkTokenValid.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+        clearAuthState(state);
       })
       .addCase(logout.fulfilled, (state, action: PayloadAction<LogoutResponse>) => {
         if (action.payload.code === 1000) {

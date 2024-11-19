@@ -4,12 +4,12 @@ import { UserInfoResponse } from "@/types/User";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 export const getUserInfo = createAsyncThunk(
   "user/getUserInfo",
-  async (_, { rejectWithValue }) => {
+  async ({token}: {token: string}, { rejectWithValue }) => {
     try {
       const response = await get<UserInfoResponse>(
         ENDPOINTS.USER_INFO,
+        token
       );
-      // console.log(response.data.result);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || error.message);
