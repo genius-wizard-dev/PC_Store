@@ -21,14 +21,14 @@ function Order() {
       </h1>
 
       <div className="grid gap-6">
-        {orders.map((order: any, index) => (
+        {orders.map((order: any) => (
           <Link key={order.id} to={`/order/${order.id}`}>
             <Card className="hover:bg-gray-50 transition-all duration-300 border border-gray-200">
               <CardHeader className="border-b border-gray-100">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-4">
                     <CardTitle className="text-xl font-medium text-gray-800">
-                      Đơn hàng #{index + 1}
+                      Đơn hàng #{order.id}
                     </CardTitle>
                     <div className="flex items-center gap-2">
                       {order.orderStatus === "DELIVERING" && (

@@ -1,8 +1,23 @@
+import { ShipCOD, VNPay } from "@/assets/Cart";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 import { ENDPOINTS } from "@/constants";
 import { useToast } from "@/hooks/use-toast";
 import { RootState } from "@/redux/store";
 import { deleteCartItem, getCartCount } from "@/redux/thunks/cart";
-import { post } from "@/services/api.service";
+import { get, post } from "@/services/api.service";
 import {
   Loader2,
   MapPin,
@@ -36,6 +51,7 @@ function Cart() {
     }
   );
   const [isOrdering, setIsOrdering] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<string>("ship");
 
   const totalPrice = useMemo(() => {
     return (
@@ -154,221 +170,337 @@ function Cart() {
       setShowAddressModal(true);
       return;
     }
-
-    setIsOrdering(true);
-    try {
-      const result = await post<any>(
-        ENDPOINTS.ORDER,
-        {
-          customerId: user?.id,
-          shipAddress: address,
-          items,
-          totalPrice,
-          orderStatus: "DELIVERING",
-        },
-        token as string
-      );
-
-      if (result.data.code === 1000) {
-        toast({
-          title: "Đặt hàng thành công",
-        });
-        dispatch(
-          getCartCount({
-            userId: user?.id as string,
-            token: token as string,
-          }) as any
+    if (paymentMethod === "ship") {
+      setIsOrdering(true);
+      try {
+        const result = await post<any>(
+          ENDPOINTS.ORDER,
+          {
+            customerId: user?.id,
+            shipAddress: address,
+            items,
+            totalPrice,
+            orderStatus: "DELIVERING",
+          },
+          token as string
         );
-      } else {
+
+        if (result.data.code === 1000) {
+          toast({
+            title: "Đặt hàng thành công",
+          });
+          dispatch(
+            getCartCount({
+              userId: user?.id as string,
+              token: token as string,
+            }) as any
+          );
+        } else {
+          toast({
+            title: "Đặt hàng thất bại",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
         toast({
-          title: "Đặt hàng thất bại",
+          title: "Hết phiên đăng nhập vui lòng đăng nhập lại",
           variant: "destructive",
         });
+        window.location.href = "/login";
+      } finally {
+        setIsOrdering(false);
       }
-    } catch (error) {
-      toast({
-        title: "Hết phiên đăng nhập vui lòng đăng nhập lại",
-        variant: "destructive",
-      });
-      window.location.href = "/login";
-    } finally {
-      setIsOrdering(false);
+    } else if (paymentMethod === "vnpay") {
+      setIsOrdering(true);
+      try {
+        const response = await get<any>(
+          `${ENDPOINTS.VNPAY}?amount=${totalPrice}`,
+          token as string
+        );
+        if (response.data.code === 1000) {
+          const orderInfo = {
+            customerId: user?.id,
+            shipAddress: address,
+            items,
+            totalPrice,
+            orderStatus: "",
+          };
+          document.cookie = `orderInfo=${JSON.stringify(orderInfo)}; path=/; max-age=3600`;
+          window.location.href = response.data.result.url;
+          // dispatch(
+          //   getCartCount({
+          //     userId: user?.id as string,
+          //     token: token as string,
+          //   }) as any
+          // );
+        } else {
+          toast({
+            title: "Đặt hàng thất bại vui lòng thử lại",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Hết phiên đăng nhập vuiý đăng nhập lại",
+          variant: "destructive",
+        });
+        window.location.href = "/login";
+      } finally {
+        setIsOrdering(false);
+      }
     }
   };
 
   return (
     <div className="container mx-auto px-4 pb-8 relative">
-      <div className="flex items-center gap-2 mb-6 text-gray-600">
-        <Link to="/" className="hover:text-orange-500">
+      <div className="flex items-center gap-2 mb-6 text-muted-foreground">
+        <Link to="/" className="hover:text-orange-500 transition-colors">
           Trang chủ
         </Link>
         <span>/</span>
         <span className="text-orange-500">Giỏ hàng</span>
       </div>
-      <h1 className="text-2xl font-bold mb-6">Giỏ hàng của bạn</h1>
+      <h1 className="text-3xl font-bold mb-8">Giỏ hàng của bạn</h1>
 
       {!items?.length ? (
-        <div className="text-center py-8">
-          <ShoppingCart className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-          <p className="text-gray-500 text-lg">
+        <div className="text-center py-16">
+          <ShoppingCart className="w-20 h-20 mx-auto text-orange-500 mb-4" />
+          <p className="text-muted-foreground text-lg mb-4">
             Không có sản phẩm trong giỏ hàng
           </p>
+          <Button
+            asChild
+            variant="outline"
+            className="hover:text-orange-500 hover:border-orange-500"
+          >
+            <Link to="/">Tiếp tục mua sắm</Link>
+          </Button>
         </div>
       ) : (
-        <>
-          <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-4">
             {items?.map((item) => (
-              <div
-                key={item.product.id}
-                className="flex items-center border p-4 rounded-lg"
-              >
-                <img
-                  src={item.product.img}
-                  alt={item.product.name}
-                  className="w-24 h-24 object-cover rounded"
-                />
-                <div className="ml-4 flex-1">
-                  <h3 className="font-semibold">{item.product.name}</h3>
-                  <p className="text-gray-600">
-                    Nhà cung cấp: {item.product.supplier.name}
-                  </p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="font-medium text-red-600">
-                      {item.product.priceAfterDiscount.toLocaleString("vi-VN")}đ
-                    </span>
-                    <span className="text-gray-500 line-through text-sm">
-                      {item.product.originalPrice.toLocaleString("vi-VN")}đ
-                    </span>
-                  </div>
-                  <div className="mt-2 flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <button
+              <Card key={item.product.id}>
+                <CardContent className="p-4 flex items-center gap-4">
+                  <img
+                    src={item.product.img}
+                    alt={item.product.name}
+                    className="w-24 h-24 object-cover rounded-lg"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-base line-clamp-2">
+                      {item.product.name}
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                      Nhà cung cấp: {item.product.supplier.name}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="font-medium text-orange-500">
+                        {item.product.priceAfterDiscount.toLocaleString(
+                          "vi-VN"
+                        )}
+                        đ
+                      </span>
+                      <span className="text-muted-foreground line-through text-sm">
+                        {item.product.originalPrice.toLocaleString("vi-VN")}đ
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
                         onClick={() => handleDecreaseQuantity(item.product.id)}
-                        className={`p-1 border rounded hover:bg-gray-100 ${
-                          loadingItems[item.product.id] ? "opacity-50" : ""
-                        }`}
                         disabled={
                           quantities[item.product.id] <= 1 ||
                           loadingItems[item.product.id]
                         }
                       >
-                        <Minus size={16} />
-                      </button>
-                      <span>{quantities[item.product.id]}</span>
-                      <button
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      <span className="w-8 text-center">
+                        {quantities[item.product.id]}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
                         onClick={() => handleIncreaseQuantity(item.product.id)}
-                        className={`p-1 border rounded hover:bg-gray-100 ${
-                          loadingItems[item.product.id] ? "opacity-50" : ""
-                        }`}
                         disabled={loadingItems[item.product.id]}
                       >
-                        <Plus size={16} />
-                      </button>
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 ml-auto text-muted-foreground hover:text-red-500"
+                        onClick={() => handleDeleteCartItem(item.product.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
-                </div>
-                <button
-                  className="p-2 text-gray-500 hover:text-red-500 transition-colors"
-                  title="Xóa sản phẩm"
-                  onClick={() => handleDeleteCartItem(item.product.id)}
-                >
-                  <Trash2 size={20} />
-                </button>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
 
-          <div className="mt-8 border-t pt-4">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-3">
-                <MapPin
-                  className="text-gray-500 hover:text-gray-600 transition-colors"
-                  size={20}
-                />
-                <span className="font-medium text-gray-800">
-                  Địa chỉ giao hàng:
-                </span>
-                {address ? (
-                  <span className="text-gray-600 truncate max-w-md">
-                    {address}
-                  </span>
-                ) : (
-                  <span className="text-red-500 font-medium">
-                    Chưa có địa chỉ
-                  </span>
-                )}
-              </div>
-              <button
-                onClick={() => setShowAddressModal(true)}
-                className="text-orange-500 hover:text-orange-600 transition-colors font-medium px-3 py-1 rounded-md hover:bg-orange-50"
-              >
-                {address ? "Chỉnh sửa" : "Thêm địa chỉ"}
-              </button>
-            </div>
-            <div className="flex justify-between items-center bg-orange-50 p-4 rounded-lg">
-              <span className="text-xl font-semibold text-gray-800">
-                Tổng tiền:
-              </span>
-              <span className="text-2xl font-bold text-red-600">
-                {totalPrice.toLocaleString("vi-VN")}đ
-              </span>
-            </div>
-          </div>
-          <div className="mt-8">
-            <button
-              onClick={handleOrder}
-              disabled={isOrdering || !items?.length}
-              className={`w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-6 rounded-lg shadow transition-colors duration-200 flex items-center justify-center gap-2 ${
-                isOrdering ? "opacity-70 cursor-not-allowed" : ""
-              }`}
-            >
-              {isOrdering ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <ShoppingCart className="w-5 h-5" />
-              )}
-              <span>{isOrdering ? "Đang xử lý..." : "Tiến hành đặt hàng"}</span>
-            </button>
-          </div>
-        </>
-      )}
+          <div className="lg:col-span-1">
+            <Card className="sticky top-4">
+              <CardContent className="p-6 space-y-6">
+                <div className="flex items-center gap-3">
+                  <MapPin className="text-orange-500" size={20} />
+                  <div className="flex-1 min-w-0">
+                    <span className="font-medium block mb-1">
+                      Địa chỉ giao hàng
+                    </span>
+                    {address ? (
+                      <p className="text-muted-foreground text-sm truncate">
+                        {address}
+                      </p>
+                    ) : (
+                      <Badge
+                        variant="outline"
+                        className="text-orange-500 border-orange-500"
+                      >
+                        Chưa có địa chỉ
+                      </Badge>
+                    )}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-orange-500 hover:text-orange-600 hover:bg-orange-50"
+                    onClick={() => setShowAddressModal(true)}
+                  >
+                    {address ? "Sửa" : "Thêm"}
+                  </Button>
+                </div>
 
-      {showAddressModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Địa chỉ giao hàng</h2>
-            <textarea
-              className="w-full p-2 border rounded-lg mb-4 min-h-[100px]"
-              placeholder="Nhập địa chỉ giao hàng của bạn"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setShowAddressModal(false)}
-                className="px-2 py-1 text-gray-600 hover:text-gray-800"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={() => {
-                  if (address.trim()) {
-                    setShowAddressModal(false);
-                  } else {
-                    toast({
-                      title: "Vui lòng nhập địa chỉ giao hàng",
-                      variant: "destructive",
-                    });
-                  }
-                }}
-                className="px-2 py-1 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
-              >
-                Xác nhận
-              </button>
-            </div>
+                <Separator />
+
+                <div>
+                  <h3 className="font-medium mb-3">Phương thức thanh toán</h3>
+                  <RadioGroup
+                    defaultValue="ship"
+                    className="grid grid-cols-2 gap-3"
+                    onValueChange={setPaymentMethod}
+                  >
+                    <div className="col-span-1">
+                      <Label
+                        htmlFor="ship"
+                        className="flex flex-col items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-orange-50 hover:border-orange-500 [&:has([data-state=checked])]:border-orange-500 [&:has([data-state=checked])]:bg-orange-50"
+                      >
+                        <img src={ShipCOD} alt="COD" className="w-8 h-8" />
+                        <RadioGroupItem
+                          value="ship"
+                          id="ship"
+                          className="sr-only"
+                        />
+                        <span className="text-sm text-center">
+                          Thanh toán khi nhận hàng
+                        </span>
+                      </Label>
+                    </div>
+                    <div className="col-span-1">
+                      <Label
+                        htmlFor="vnpay"
+                        className="flex flex-col items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-orange-50 hover:border-orange-500 [&:has([data-state=checked])]:border-orange-500 [&:has([data-state=checked])]:bg-orange-50"
+                      >
+                        <img src={VNPay} alt="VNPay" className="w-8 h-8" />
+                        <RadioGroupItem
+                          value="vnpay"
+                          id="vnpay"
+                          className="sr-only"
+                        />
+                        <span className="text-sm text-center">
+                          Thanh toán VNPay
+                        </span>
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Tạm tính:</span>
+                    <span>{totalPrice.toLocaleString("vi-VN")}đ</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Phí vận chuyển:</span>
+                    <span>0đ</span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between items-center font-medium text-lg">
+                    <span>Tổng tiền:</span>
+                    <span className="text-orange-500">
+                      {totalPrice.toLocaleString("vi-VN")}đ
+                    </span>
+                  </div>
+                </div>
+
+                <Button
+                  className="w-full bg-orange-500 hover:bg-orange-600"
+                  size="lg"
+                  onClick={handleOrder}
+                  disabled={isOrdering || !items?.length}
+                >
+                  {isOrdering ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      Đang xử lý...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      {paymentMethod === "ship" ? "Đặt hàng" : "Thanh toán"}
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       )}
+
+      <Dialog open={showAddressModal} onOpenChange={setShowAddressModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Địa chỉ giao hàng</DialogTitle>
+          </DialogHeader>
+          <Textarea
+            className="min-h-[100px] resize-none"
+            placeholder="Nhập địa chỉ giao hàng của bạn"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+          />
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowAddressModal(false)}
+            >
+              Hủy
+            </Button>
+            <Button
+              className="bg-orange-500 hover:bg-orange-600"
+              onClick={() => {
+                if (address.trim()) {
+                  setShowAddressModal(false);
+                } else {
+                  toast({
+                    title: "Vui lòng nhập địa chỉ giao hàng",
+                    variant: "destructive",
+                  });
+                }
+              }}
+            >
+              Xác nhận
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

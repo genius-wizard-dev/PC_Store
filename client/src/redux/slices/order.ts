@@ -25,7 +25,7 @@ const orderSlice = createSlice({
       })
       .addCase(viewOrder.fulfilled, (state, action: PayloadAction<ListOrderRespone> ) => {
         state.status = "succeeded"
-        state.orders = action.payload.result
+        state.orders = action.payload.result.reverse()
       })
       .addCase(viewOrder.rejected, (state, action) => {
         state.status = "failed"
@@ -34,6 +34,6 @@ const orderSlice = createSlice({
   }
 })
 
-export const { clearOrder } = orderSlice.actions
+// export const { clearOrder } = orderSlice.actions
 export default orderSlice.reducer
 

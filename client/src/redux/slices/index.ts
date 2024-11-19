@@ -1,6 +1,5 @@
 import { clearAuth } from './auth';
 import { clearCart } from './cart';
-import { clearOrder } from './order';
 import { clearUser } from './user';
 export { default as authReducer } from './auth';
 export { default as cartReducer } from './cart';
@@ -11,6 +10,5 @@ export const clearAllState = () => (dispatch: any) => {
   dispatch(clearAuth());
   dispatch(clearCart());
   dispatch(clearUser());
-  dispatch(clearOrder());
 };
 
