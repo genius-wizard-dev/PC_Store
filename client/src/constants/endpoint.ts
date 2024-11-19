@@ -14,7 +14,7 @@ const ENDPOINT = {
     DECREASE_QUANTITY: `/api/cart/decreaseQuantity`,
     INCREASE_QUANTITY: `/api/cart/increaseQuantity`,
     ORDER: `/api/orders`,
-
+    VNPAY: `/api/payment/create_payment`
 }
 
 export default ENDPOINT;
