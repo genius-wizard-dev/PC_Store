@@ -15,11 +15,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartItem {
-
-
     Product product;
-
     int quantity;
-
-
 }

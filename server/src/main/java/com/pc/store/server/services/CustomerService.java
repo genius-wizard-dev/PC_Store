@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.pc.store.server.dao.CustomerRespository;
+import com.pc.store.server.dao.CustomerRepository;
 import com.pc.store.server.dto.request.CustomerCreationResquest;
 import com.pc.store.server.dto.response.CustomerResponse;
 import com.pc.store.server.entities.Customer;
@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomerService {
 
-    final CustomerRespository customerRespository;
+    final CustomerRepository customerRespository;
     final MongoTemplate mongoTemplate;
     final PasswordEncoder passwordEncoder;
     final CustomerMapper customerMapper;

@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 import com.pc.store.server.entities.Customer;
 
 @Repository
-public interface CustomerRespository extends MongoRepository<Customer, ObjectId> {
+public interface CustomerRepository extends MongoRepository<Customer, ObjectId> {
     Optional<Customer> findByUserName(String userName);
 }

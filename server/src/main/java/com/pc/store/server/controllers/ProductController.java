@@ -40,9 +40,9 @@ public class ProductController {
     }
 
     @GetMapping("{name}")
-    public ApiResponse<List<ProductResponse>> getProductByName(@PathVariable String name) {
-        var products = productService.getProductByName(name);
-        return ApiResponse.<List<ProductResponse>>builder().result(products).build();
+    public ApiResponse<Page<Product>> getProductByName(@PathVariable String name,@RequestParam(defaultValue = "0") int page) {
+        var products = productService.getProductByName(name,page,size);
+        return ApiResponse.<Page<Product>>builder().result(products).build();
     }
     @GetMapping("/id")
     public ApiResponse<ProductResponse> getProductById(@RequestParam String id) {
