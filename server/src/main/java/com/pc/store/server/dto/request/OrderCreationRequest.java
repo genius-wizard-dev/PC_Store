@@ -17,6 +17,6 @@ public class OrderCreationRequest {
     String shipAddress;
     List<CartItem> items;
     double totalPrice;
-    boolean isPaid;
+    String isPaid;
     String orderStatus;
 }
