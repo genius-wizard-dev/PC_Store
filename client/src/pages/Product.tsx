@@ -4,33 +4,32 @@ import { RootState } from "@/redux/store";
 import { addToCart, getCartCount } from "@/redux/thunks/cart";
 import { get } from "@/services/api.service";
 import { Product, ProductResponse } from "@/types";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-
 function ProductPage() {
+  const [search, setSearch] = useState<string>("");
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [sortType, setSortType] = useState<"asc" | "desc" | null>(null);
+  const [sortType, setSortType] = useState<"asc" | "desc" | "all" | "">("");
   const dispatch = useDispatch();
   const { isLogin, token } = useSelector((state: RootState) => state.auth);
   const { user } = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
   useEffect(() => {
-    const fetchProducts = async () => {
-      let url = `${ENDPOINTS.LIST_PRODUCT}?page=${page}`;
-      if (sortType) {
-        url = `${ENDPOINTS.LIST_PRODUCT}/${sortType}?page=${page}`;
-      }
-      const response = await get<{ result: ProductResponse }>(url);
-      setProducts(response.data.result.content);
-      setTotalPages(response.data.result.totalPages);
-    };
     fetchProducts();
   }, [page, sortType]);
-
+  const fetchProducts = async () => {
+    let url = `${ENDPOINTS.LIST_PRODUCT}?page=${page}`;
+    if (sortType) {
+      url = `${ENDPOINTS.LIST_PRODUCT}/${sortType}?page=${page}`;
+    }
+    const response = await get<{ result: ProductResponse }>(url);
+    setProducts(response.data.result.content);
+    setTotalPages(response.data.result.totalPages);
+  };
   const handlePrevPage = () => {
     if (page > 0) {
       setPage(page - 1);
@@ -43,7 +42,12 @@ function ProductPage() {
     }
   };
 
-  const handleSort = (type: "asc" | "desc" | null) => {
+  const handleSort = (type: "asc" | "desc" | "all") => {
+    if (type == "all") {
+      fetchProducts();
+      setSortType(type);
+      return;
+    }
     setSortType(type);
     setPage(0);
   };
@@ -80,6 +84,18 @@ function ProductPage() {
     }
   };
 
+  const handleSearch = async () => {
+    setSortType("");
+    if (search.trim() == "") fetchProducts();
+    else {
+      setPage(0);
+      const response = await get<{ result: ProductResponse }>(
+        `${ENDPOINTS.LIST_PRODUCT}/${search}?page=${page}`
+      );
+      setProducts(response.data.result.content);
+      setTotalPages(response.data.result.totalPages);
+    }
+  };
   return (
     <div className="container mx-auto px-4">
       <div className="flex items-center gap-2 mb-6 text-gray-600">
@@ -89,15 +105,31 @@ function ProductPage() {
         <span>/</span>
         <span className="text-orange-500">Danh sách sản phẩm</span>
       </div>
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Nhập nội dung cần tìm kiếm"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="px-4 py-[0.58rem] border border-orange-300 rounded-lg bg-white shadow-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
+          />
+          <button
+            onClick={handleSearch}
+            className="px-4 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+          >
+            <Search size={20} />
+          </button>
+        </div>
         <select
           className="px-4 py-2 border rounded-lg bg-white shadow-sm"
-          onChange={(e) => handleSort(e.target.value as "asc" | "desc" | null)}
-          value={sortType || ""}
+          onChange={(e) => handleSort(e.target.value as "asc" | "desc" | "all")}
+          value={sortType}
         >
           <option value="">Sắp xếp theo giá</option>
           <option value="asc">Giá tăng dần</option>
           <option value="desc">Giá giảm dần</option>
+          <option value="all">Tất cả</option>
         </select>
       </div>
 
