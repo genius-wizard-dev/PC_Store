@@ -4,7 +4,7 @@ import { useToast } from "@/hooks";
 import { RootState } from "@/redux/store";
 import { viewOrder } from "@/redux/thunks/order";
 import { put } from "@/services/api.service";
-import { Package2, Phone, Truck, User, XCircle } from "lucide-react";
+import { Clock, Package2, Phone, Truck, User, XCircle } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 function OrderDetail() {
@@ -135,6 +135,13 @@ function OrderDetail() {
                 <div>
                   <div className="text-sm font-medium">Địa chỉ giao hàng</div>
                   <div className="text-sm">{order.shipAddress}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 bg-white p-3 rounded-lg">
+                <Clock className="h-5 w-5 text-orange-500" />
+                <div>
+                  <div className="text-sm font-medium">Ngày đặt hàng</div>
+                  <div className="text-sm">{order.orderDate.toString()}</div>
                 </div>
               </div>
             </div>

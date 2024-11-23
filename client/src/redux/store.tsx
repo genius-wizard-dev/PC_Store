@@ -1,4 +1,10 @@
-import { authReducer, cartReducer, orderReducer, userReducer } from "@/redux/slices";
+import {
+  adminReducer,
+  authReducer,
+  cartReducer,
+  orderReducer,
+  userReducer,
+} from "@/redux/slices";
 import { configureStore } from "@reduxjs/toolkit";
 
 const store = configureStore({
@@ -7,6 +13,7 @@ const store = configureStore({
     user: userReducer,
     cart: cartReducer,
     order: orderReducer,
+    admin: adminReducer,
   },
 });
 

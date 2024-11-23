@@ -1,5 +1,5 @@
 export interface Product {
-  id:                 string;
+  id?:                 string;
   name:               string;
   img:                string;
   priceAfterDiscount: number;
@@ -7,6 +7,8 @@ export interface Product {
   discountPercent:    number;
   priceDiscount:      number;
   supplier:           Supplier;
+  inStock:            number;
+  updateDetail?:       boolean;
 }
 
 export interface Supplier {

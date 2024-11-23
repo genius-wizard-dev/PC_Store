@@ -1,5 +1,6 @@
 import { useToast } from "@/hooks/use-toast";
 import MainLayout from "@/layouts/MainLayout";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
@@ -11,6 +12,7 @@ import { checkTokenValid } from "./redux/thunks/auth";
 import { getCartCount } from "./redux/thunks/cart";
 import { viewOrder } from "./redux/thunks/order";
 import { getUserInfo } from "./redux/thunks/user";
+
 function App() {
   const { isLogin, token } = useSelector((state: RootState) => state.auth);
   const [loading, setLoading] = useState(false);
@@ -30,12 +32,14 @@ function App() {
           );
 
           if (userPayload.result) {
-            await dispatch(
-              getCartCount({ userId: userPayload.result.id, token }) as any
-            );
-            await dispatch(
-              viewOrder({ userId: userPayload.result.id, token }) as any
-            );
+            await Promise.all([
+              dispatch(
+                getCartCount({ userId: userPayload.result.id, token }) as any
+              ),
+              dispatch(
+                viewOrder({ userId: userPayload.result.id, token }) as any
+              ),
+            ]);
           }
         }
       } catch (error) {
@@ -54,10 +58,20 @@ function App() {
     };
 
     checkAuth();
-  }, [token]);
+  }, [token, dispatch]);
 
   if (loading) {
-    return null;
+    return (
+      <div className="flex flex-col justify-center items-center h-screen bg-gray-100">
+        <Loader2 className="h-12 w-12 animate-spin text-orange-500 mb-4" />
+        <div className="text-lg font-semibold text-gray-700 animate-pulse">
+          Đang tải...
+        </div>
+        <div className="mt-2 text-sm text-gray-500 animate-fade-in">
+          Vui lòng chờ trong giây lát
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -76,7 +90,6 @@ function App() {
           <Route path="/:page" element={<PageRender />} />
           <Route path="/:page/:id" element={<PageRender />} />
         </Route>
-        {/* Các routes khác */}
       </Routes>
     </BrowserRouter>
   );

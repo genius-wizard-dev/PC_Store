@@ -14,7 +14,11 @@ const ENDPOINT = {
     DECREASE_QUANTITY: `/api/cart/decreaseQuantity`,
     INCREASE_QUANTITY: `/api/cart/increaseQuantity`,
     ORDER: `/api/orders`,
-    VNPAY: `/api/payment/create_payment`
+    VNPAY: `/api/payment/create_payment`,
+    ADMIN: `/api/admin`,
+    ADD_PRODUCT: `/api/admin/add-product`,
+    UPDATE_PRODUCT: `/api/admin/update-product`,
+    DELETE_PRODUCT: `/api/admin/delete-product`,
 }
 
 export default ENDPOINT;

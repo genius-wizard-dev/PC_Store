@@ -1,4 +1,4 @@
-export interface ListOrderRespone {
+export interface ListOrderResponse {
   code:   number;
   result: Result[];
 }
@@ -9,8 +9,11 @@ export interface Result {
   shipAddress: string;
   items:       Item[];
   totalPrice:  number;
-  orderStatus: string
+  orderStatus: string;
+  orderDate:   string;
 }
+
+
 
 export interface Customer {
   id:          string;

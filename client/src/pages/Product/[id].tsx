@@ -12,7 +12,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 const Detail = () => {
   const { id } = useParams<{ id: string }>();
   const [productDetail, setProductDetail] = useState<ProductDetail>();
-  const { user } = useSelector((state: RootState) => state.user);
+  const { info:user } = useSelector((state: RootState) => state.user);
   const { isLogin, token } = useSelector((state: RootState) => state.auth);
   const { toast } = useToast();
   const navigate = useNavigate();

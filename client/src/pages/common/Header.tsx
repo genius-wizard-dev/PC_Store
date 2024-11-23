@@ -9,12 +9,12 @@ import { Link, useNavigate } from "react-router-dom";
 
 export default function Header() {
   const { isLogin, token } = useSelector((state: RootState) => state.auth);
-  const { user } = useSelector((state: RootState) => state.user);
+  const { info: user } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-
+  const isAdmin = user?.roles.some((role) => role.name === "ADMIN");
   const userMenuRef = useRef<HTMLDivElement>(null);
   const userModalRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -102,8 +102,7 @@ export default function Header() {
         className={`flex justify-center items-center text-white fixed w-[90%] sm:w-[95%] top-5 z-50 max-h-16 rounded-full backdrop-blur-md left-1/2 -translate-x-1/2 transition-all duration-500  bg-black/70`}
         style={{
           boxShadow: isScrolled
-            ? `
-            0 0 40px rgba(251,146,60,0.6),
+            ? `0 0 40px rgba(251,146,60,0.6),
             inset 0 0 40px rgba(251,146,60,0.3),
             0 0 80px rgba(251,146,60,0.2),
             0 0 120px rgba(251,146,60,0.15),
@@ -217,6 +216,39 @@ export default function Header() {
                       >
                         Lịch sử mua hàng
                       </button>
+                      {isAdmin && (
+                        <>
+                          <div className="h-[1px] bg-gray-200 my-1"></div>
+                          <button
+                            onClick={() => {
+                              navigate("/admin/customer");
+                              setShowUserMenu(false);
+                            }}
+                            className="block w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-orange-100 transition-colors duration-200"
+                          >
+                            Quản lý người dùng
+                          </button>
+                          <button
+                            onClick={() => {
+                              navigate("/admin/product");
+                              setShowUserMenu(false);
+                            }}
+                            className="block w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-orange-100 transition-colors duration-200"
+                          >
+                            Quản lý sản phẩm
+                          </button>
+                          <button
+                            onClick={() => {
+                              navigate("/admin/order");
+                              setShowUserMenu(false);
+                            }}
+                            className="block w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-orange-100 transition-colors duration-200"
+                          >
+                            Quản lý đơn hàng
+                          </button>
+                          <div className="h-[1px] bg-gray-200 my-1"></div>
+                        </>
+                      )}
                       <button
                         onClick={handleLogout}
                         className="block w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-orange-100 transition-colors duration-200"
