@@ -6,6 +6,7 @@ import com.pc.store.server.entities.Order;
 import com.pc.store.server.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,12 +15,14 @@ import java.util.List;
 @RestController
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/api/orders")
 public class OrderController {
     OrderService orderService;
 
     @PostMapping
     public ApiResponse<Boolean> saveOrder(@RequestBody OrderCreationRequest request){
+        log.info(request.toString());
         boolean result = orderService.saveOrder(request);
         return ApiResponse.<Boolean>builder().result(result).build();
     }

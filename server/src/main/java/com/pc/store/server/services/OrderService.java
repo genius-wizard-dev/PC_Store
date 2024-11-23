@@ -41,6 +41,7 @@ public class OrderService {
                 .items(request.getItems())
                 .totalPrice(request.getTotalPrice())
                 .orderStatus(OrderStatus.valueOf(request.getOrderStatus()))
+                .isPaid(request.getIsPaid().equals("true"))
                 .build();
         orderRepository.save(order);
         try {
