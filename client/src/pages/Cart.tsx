@@ -17,6 +17,7 @@ import { ENDPOINTS } from "@/constants";
 import { useToast } from "@/hooks/use-toast";
 import { RootState } from "@/redux/store";
 import { deleteCartItem, getCartCount } from "@/redux/thunks/cart";
+import { viewOrder } from "@/redux/thunks/order";
 import { get, post } from "@/services/api.service";
 import {
   Loader2,
@@ -34,7 +35,7 @@ function Cart() {
   const { items } = useSelector((state: RootState) => state.cart);
   const dispatch = useDispatch();
   const { toast } = useToast();
-  const { user } = useSelector((state: RootState) => state.user);
+  const { info: user } = useSelector((state: RootState) => state.user);
   const { token } = useSelector((state: RootState) => state.auth);
   const [loadingItems, setLoadingItems] = useState<{ [key: string]: boolean }>(
     {}
@@ -45,7 +46,7 @@ function Cart() {
     () => {
       const initialQuantities: { [key: string]: number } = {};
       items?.forEach((item) => {
-        initialQuantities[item.product.id] = item.quantity;
+        initialQuantities[item.product.id as string] = item.quantity;
       });
       return initialQuantities;
     }
@@ -57,7 +58,7 @@ function Cart() {
     return (
       items?.reduce((total, item) => {
         if (!item?.product?.priceAfterDiscount) return total;
-        const quantity = quantities[item.product.id] || item.quantity;
+        const quantity = quantities[item.product.id as string] || item.quantity;
         return total + item.product.priceAfterDiscount * quantity;
       }, 0) || 0
     );
@@ -145,17 +146,31 @@ function Cart() {
           ...prev,
           [productId]: prev[productId] - 1,
         }));
+        if (result.data.code === 6001) {
+          toast({
+            title: "Sản phẩm không đủ số lượng trong kho",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Tăng số lượng thất bại",
+            variant: "destructive",
+          });
+        }
+      }
+    } catch (error: any) {
+      setQuantities((prev) => ({ ...prev, [productId]: prev[productId] - 1 }));
+      if (error.response && error.response.data.code === 6001) {
         toast({
-          title: "Tăng số lượng thất bại",
+          title: "Sản phẩm không đủ số lượng trong kho",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Đã có lỗi xảy ra",
           variant: "destructive",
         });
       }
-    } catch (error) {
-      setQuantities((prev) => ({ ...prev, [productId]: prev[productId] - 1 }));
-      toast({
-        title: "Đã có lỗi xảy ra",
-        variant: "destructive",
-      });
     } finally {
       setLoadingItems((prev) => ({ ...prev, [productId]: false }));
     }
@@ -181,10 +196,10 @@ function Cart() {
             items,
             totalPrice,
             orderStatus: "DELIVERING",
+            isPaid: "false",
           },
           token as string
         );
-
         if (result.data.code === 1000) {
           toast({
             title: "Đặt hàng thành công",
@@ -195,18 +210,32 @@ function Cart() {
               token: token as string,
             }) as any
           );
+          dispatch(
+            viewOrder({
+              userId: user?.id as string,
+              token: token as string,
+            }) as any
+          );
+        } else {
+          throw new Error("Failed to order");
+        }
+      } catch (error: any) {
+        if (error.response && error.response.status === 401) {
+          toast({
+            title: "Hết phiên đăng nhập",
+            description: "Vui lòng đăng nhập lại",
+            variant: "destructive",
+          });
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 2000);
         } else {
           toast({
             title: "Đặt hàng thất bại",
+            description: error.message || "Đã xảy ra lỗi không xác định",
             variant: "destructive",
           });
         }
-      } catch (error) {
-        toast({
-          title: "Hết phiên đăng nhập vui lòng đăng nhập lại",
-          variant: "destructive",
-        });
-        window.location.href = "/login";
       } finally {
         setIsOrdering(false);
       }
@@ -225,14 +254,10 @@ function Cart() {
             totalPrice,
             orderStatus: "",
           };
-          document.cookie = `orderInfo=${JSON.stringify(orderInfo)}; path=/; max-age=3600`;
+          document.cookie = `orderInfo=${JSON.stringify(
+            orderInfo
+          )}; path=/; max-age=3600`;
           window.location.href = response.data.result.url;
-          // dispatch(
-          //   getCartCount({
-          //     userId: user?.id as string,
-          //     token: token as string,
-          //   }) as any
-          // );
         } else {
           toast({
             title: "Đặt hàng thất bại vui lòng thử lại",
@@ -273,7 +298,7 @@ function Cart() {
             variant="outline"
             className="hover:text-orange-500 hover:border-orange-500"
           >
-            <Link to="/">Tiếp tục mua sắm</Link>
+            <Link to="/product">Tiếp tục mua sắm</Link>
           </Button>
         </div>
       ) : (

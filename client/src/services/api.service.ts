@@ -81,6 +81,7 @@ export const patch = async <T>(uri: string, data?: any, token?: string): Promise
     }
 };
 
+
 // Example usage functions
 // export const fetchBannerData = () => api.get<{ result: BannerData[] }>(ENDPOINTS.BANNER);
 // export const getCategories = () => api.get<{ result: Category[] }>(ENDPOINTS.CATEGORIES);

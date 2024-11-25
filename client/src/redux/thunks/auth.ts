@@ -1,29 +1,23 @@
 import { ENDPOINTS } from "@/constants";
 import { post } from "@/services/api.service";
-import { CheckTokenValidResponse, Credentials, LoginResponse, LogoutResponse, RegisterCredentials, RegisterResponse } from "@/types/Auth";
+import { CheckTokenValidResponse, LoginCredentials, LoginResponse, LogoutResponse, RegisterCredentials, RegisterResponse } from "@/types";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { z } from "zod";
 
-// Thunk để login người dùng
 export const login = createAsyncThunk(
   "auth/login",
-  async (credentials: Credentials, { rejectWithValue }) => {
+  async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
-      const response = await post<LoginResponse>(
-        ENDPOINTS.LOGIN,
-        credentials
-      );
-
+      const response = await post<LoginResponse>(ENDPOINTS.LOGIN, credentials);
       if (!response.data?.result?.token) {
         throw new Error('Token không hợp lệ');
       }
-
       return response.data;
-    } catch (error: any) {
-      // console.error('Login error:', error.response?.data || error.message);
-      return rejectWithValue(
-        error.response?.data?.message ||
-        'Đăng nhập thất bại, vui lòng thử lại'
-      );
+    }  catch (error) {
+      if (error instanceof z.ZodError) {
+        return rejectWithValue(error.errors);
+      }
+      return rejectWithValue((error as Error).message);
     }
   }
 );
@@ -38,8 +32,11 @@ export const register = createAsyncThunk(
         credentials
       );
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+    }  catch (error) {
+      if (error instanceof z.ZodError) {
+        return rejectWithValue(error.errors);
+      }
+      return rejectWithValue((error as Error).message);
     }
   }
 );
@@ -59,8 +56,11 @@ export const checkTokenValid = createAsyncThunk(
       }
 
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return rejectWithValue(error.errors);
+      }
+      return rejectWithValue((error as Error).message);
     }
   }
 );
@@ -71,8 +71,11 @@ export const logout = createAsyncThunk(
     try {
       const response = await post<LogoutResponse>(ENDPOINTS.LOGOUT, { token });
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+    }  catch (error) {
+      if (error instanceof z.ZodError) {
+        return rejectWithValue(error.errors);
+      }
+      return rejectWithValue((error as Error).message);
     }
   }
 );

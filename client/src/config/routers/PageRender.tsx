@@ -1,30 +1,33 @@
 import { NotFound } from "@/pages";
 import { RootState } from "@/redux/store";
-import { checkTokenValid } from "@/redux/thunks/auth";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-
 const pages: any = import.meta.glob("../../pages/**/*.tsx");
 
-// Pages that require authentication
-const PROTECTED_PAGES = ["Cart", "Order", "Profile"];
+const PUBLIC_PAGES = [
+  "Login",
+  "Register",
+  "NotFound",
+  "Home",
+  "Product",
+  "About",
+  "Vnpay",
+];
+const USER_PAGES = [...PUBLIC_PAGES, "Cart", "Order", "Profile", "OrderDetail"];
+const ADMIN_PAGES = [...USER_PAGES, "Admin"];
 
 const PageRender: React.FC = () => {
   const { page, id } = useParams<{ page: string; id: string }>();
   const [Component, setComponent] = useState<React.ComponentType | null>(null);
   const [notFound, setNotFound] = useState<boolean>(false);
-  const { isLogin, token } = useSelector((state: RootState) => state.auth);
-  const dispatch = useDispatch();
+  const { isLogin } = useSelector((state: RootState) => state.auth);
+  const { info: user } = useSelector((state: RootState) => state.user);
   const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
 
   useEffect(() => {
-    if (token) {
-      dispatch(checkTokenValid(token) as any);
-    }
-
     const loadComponent = async () => {
       if (!page) {
         setNotFound(true);
@@ -35,31 +38,51 @@ const PageRender: React.FC = () => {
       try {
         const formatPage = page.charAt(0).toUpperCase() + page.slice(1);
         let pagePath = `../../pages/${formatPage}.tsx`;
+        console.log(formatPage);
 
-        // Determine the correct page path
-        if (id) {
+        if (id && formatPage !== "Admin") {
           pagePath = `../../pages/${formatPage}/[id].tsx`;
-        } else if (formatPage === "Vnpay" && searchParams.get("vnp_ResponseCode")) {
+        } else if (
+          formatPage === "Vnpay" &&
+          searchParams.get("vnp_ResponseCode")
+        ) {
           pagePath = `../../pages/${formatPage}/PaymentResult.tsx`;
+        } else if (formatPage === "Admin") {
+          const subPage = id
+            ? id.charAt(0).toUpperCase() + id.slice(1)
+            : "Index";
+          console.log(subPage);
+          pagePath = `../../pages/${formatPage}/${subPage}.tsx`;
         }
 
-        // Check if page exists
         if (!pages[pagePath]) {
           setNotFound(true);
           setComponent(null);
           return;
         }
+        const userRole = user?.roles || [{ name: "GUEST" }];
 
-        // Check authentication for protected pages
-        if (!isLogin && PROTECTED_PAGES.includes(formatPage)) {
-          navigate("/login", { 
-            replace: true,
-            state: { from: location.pathname }
-          });
+        const allowedPages = userRole.some((role) => role.name === "ADMIN")
+          ? ADMIN_PAGES
+          : userRole.some((role) => role.name === "USER")
+          ? USER_PAGES
+          : PUBLIC_PAGES;
+
+        if (
+          !PUBLIC_PAGES.includes(formatPage) &&
+          !allowedPages.includes(formatPage)
+        ) {
+          if (!isLogin) {
+            navigate("/login", {
+              replace: true,
+              state: { from: location.pathname + location.search },
+            });
+            return;
+          }
+          navigate("/", { replace: true });
           return;
         }
 
-        // Load the component
         const module = await pages[pagePath]();
         setComponent(() => module.default);
         setNotFound(false);
@@ -71,12 +94,11 @@ const PageRender: React.FC = () => {
     };
 
     loadComponent();
-  }, [page, id, token, isLogin, dispatch, location.pathname, location.search, navigate]);
+  }, [page, id, isLogin, user, location.pathname, location.search, navigate]);
 
   if (notFound) return <NotFound />;
   if (Component) return <Component />;
 
-  // Loading state could be added here
   return null;
 };
 

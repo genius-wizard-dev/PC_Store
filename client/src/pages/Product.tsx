@@ -1,13 +1,25 @@
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ENDPOINTS } from "@/constants";
 import { toast } from "@/hooks/use-toast";
 import { RootState } from "@/redux/store";
 import { addToCart, getCartCount } from "@/redux/thunks/cart";
 import { get } from "@/services/api.service";
 import { Product, ProductResponse } from "@/types";
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import {
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  MapPin,
+  Package,
+  Search,
+  ShoppingBag,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+
 function ProductPage() {
   const [search, setSearch] = useState<string>("");
   const [products, setProducts] = useState<Product[]>([]);
@@ -15,12 +27,15 @@ function ProductPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [sortType, setSortType] = useState<"asc" | "desc" | "all" | "">("");
   const dispatch = useDispatch();
+  const { items } = useSelector((state: RootState) => state.cart);
   const { isLogin, token } = useSelector((state: RootState) => state.auth);
-  const { user } = useSelector((state: RootState) => state.user);
+  const { info: user } = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
+
   useEffect(() => {
     fetchProducts();
   }, [page, sortType]);
+
   const fetchProducts = async () => {
     let url = `${ENDPOINTS.LIST_PRODUCT}?page=${page}`;
     if (sortType) {
@@ -30,6 +45,7 @@ function ProductPage() {
     setProducts(response.data.result.content);
     setTotalPages(response.data.result.totalPages);
   };
+
   const handlePrevPage = () => {
     if (page > 0) {
       setPage(page - 1);
@@ -60,14 +76,25 @@ function ProductPage() {
       });
       return;
     }
+    const getQuantity: number | undefined = items.find(
+      (item) => item.product.id === product.id
+    )?.quantity;
+    console.log(getQuantity);
+    if (getQuantity && product.inStock - getQuantity <= 0) {
+      toast({
+        title: "Sản phẩm không còn đủ số lượng trong kho",
+      });
+      return;
+    }
     try {
       await dispatch(
         addToCart({
           userId: user?.id as string,
-          productId: product.id,
+          productId: product.id as string,
           token: token as string,
         }) as any
       );
+
       toast({
         title: "Thêm vào giỏ hàng thành công",
       });
@@ -96,6 +123,7 @@ function ProductPage() {
       setTotalPages(response.data.result.totalPages);
     }
   };
+
   return (
     <div className="container mx-auto px-4">
       <div className="flex items-center gap-2 mb-6 text-gray-600">
@@ -137,58 +165,101 @@ function ProductPage() {
         {products.map((product: Product) => (
           <div
             key={product.id}
-            className="group bg-white border rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+            className={`group bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-300 ${
+              product.updateDetail
+                ? "hover:shadow-xl hover:-translate-y-2"
+                : "opacity-80 cursor-not-allowed"
+            }`}
           >
-            <Link to={`/product/${product.id}`}>
-              <div className="relative">
-                <img
-                  src={product.img}
-                  alt={product.name}
-                  className="w-full h-52 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-sm font-medium">
-                  -{product.discountPercent.toFixed(1)}%
-                </div>
-              </div>
-
-              <h3 className="text-lg font-semibold mt-3 line-clamp-2 group-hover:text-orange-600 transition-colors">
-                {product.name}
-              </h3>
-
-              <div className="mt-2 space-y-1">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-red-600 font-bold text-xl">
-                    {product.priceAfterDiscount.toLocaleString()}đ
-                  </span>
-                  <span className="text-gray-400 line-through text-sm">
-                    {product.originalPrice.toLocaleString()}đ
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-3 pt-3 border-t border-gray-100">
-                <div className="text-sm text-gray-600 space-y-1">
-                  <div className="flex items-center gap-1">
-                    <span className="font-medium">Nhà cung cấp:</span>
-                    <span>{product.supplier.name}</span>
+            {product.updateDetail ? (
+              <Link to={`/product/${product.id}`} className="block">
+                <div className="relative">
+                  <img
+                    src={product.img}
+                    alt={product.name}
+                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md">
+                    -{product.discountPercent.toFixed(1)}%
                   </div>
-                  <div className="flex items-center gap-1">
-                    <span className="font-medium">Địa chỉ:</span>
-                    <span className="line-clamp-1">
-                      {product.supplier.address}
+                </div>
+
+                <div className="p-5">
+                  <h3 className="text-xl font-bold mb-2 line-clamp-2 group-hover:text-orange-600 transition-colors">
+                    {product.name}
+                  </h3>
+
+                  <div className="flex items-baseline gap-2 mb-3">
+                    <span className="text-2xl font-bold text-red-600">
+                      {product.priceAfterDiscount.toLocaleString()}đ
+                    </span>
+                    <span className="text-sm text-gray-400 line-through">
+                      {product.originalPrice.toLocaleString()}đ
                     </span>
                   </div>
+
+                  <div className="text-sm text-gray-600 space-y-2 border-t pt-3">
+                    <div className="flex items-center gap-2">
+                      <ShoppingBag className="w-4 h-4 text-orange-500" />
+                      <span>{product.supplier.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-orange-500" />
+                      <span className="line-clamp-1">
+                        {product.supplier.address}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Package className="w-4 h-4 text-orange-500" />
+                      <span>Còn lại: {product.inStock}</span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ) : (
+              <div className="relative p-5">
+                <div className="relative h-64 rounded-xl overflow-hidden mb-4">
+                  <img
+                    src={product.img}
+                    alt={product.name}
+                    className="w-full h-full object-cover filter grayscale"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                    <Badge
+                      variant="secondary"
+                      className="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-full font-semibold text-lg shadow-lg"
+                    >
+                      <Clock className="w-5 h-5" />
+                      <span>Sắp về hàng</span>
+                    </Badge>
+                  </div>
+                </div>
+
+                <h3 className="text-xl font-bold mb-2 line-clamp-2 text-gray-700">
+                  {product.name}
+                </h3>
+                <p className="text-sm text-gray-500 italic mb-4">
+                  Sản phẩm sẽ sớm được cập nhật
+                </p>
+
+                <div className="absolute bottom-5 right-5">
+                  <div className="bg-yellow-100 p-3 rounded-full shadow-lg">
+                    <AlertTriangle className="h-6 w-6 text-yellow-600" />
+                  </div>
                 </div>
               </div>
-            </Link>
-            <div className="mt-3 flex justify-end">
-              <button
-                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
-                onClick={() => handleAddCart(product)}
-              >
-                Mua ngay
-              </button>
-            </div>
+            )}
+            {product.updateDetail && (
+              <div className="px-5 pb-5">
+                <Button
+                  className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold py-3 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg"
+                  onClick={() => handleAddCart(product)}
+                  disabled={product.inStock === 0}
+                >
+                  {product.inStock === 0 ? "Hết hàng" : "Thêm vào giỏ hàng"}
+                </Button>
+              </div>
+            )}
           </div>
         ))}
       </div>

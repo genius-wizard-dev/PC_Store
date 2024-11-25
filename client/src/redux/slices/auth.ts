@@ -1,6 +1,5 @@
-import { BaseState } from '@/types/store';
+import { BaseState, CheckTokenValidResponse, LoginResponse, LogoutResponse } from '@/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CheckTokenValidResponse, LoginResponse, LogoutResponse } from '../../types/Auth';
 import { checkTokenValid, login, logout } from '../thunks/auth';
 
 interface AuthState extends BaseState {

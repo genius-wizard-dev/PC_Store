@@ -1,16 +1,19 @@
 import { ENDPOINTS } from "@/constants";
 import { del, get, post } from "@/services/api.service";
-import { CartCountResponse } from "@/types/Cart";
+import { CartCountResponse } from "@/types";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-
+import { z } from "zod";
 export const getCartCount = createAsyncThunk(
   "cart/getCartCount",
   async ({userId, token}: {userId: string, token: string}, { rejectWithValue }) => {
     try {
       const response = await get<CartCountResponse>(`${ENDPOINTS.CART_COUNT}/items/${userId}`, token);
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Lấy số lượng sản phẩm trong giỏ hàng thất bại");
+    }  catch (error) {
+      if (error instanceof z.ZodError) {
+        return rejectWithValue(error.errors);
+      }
+      return rejectWithValue((error as Error).message);
     }
   }
 );

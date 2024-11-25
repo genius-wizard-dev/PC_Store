@@ -1,5 +1,4 @@
-import { CartItem } from "@/types/Cart";
-import { BaseState } from "@/types/store";
+import { BaseState, CartItem } from "@/types";
 import { createSlice } from "@reduxjs/toolkit";
 import { addToCart, deleteCartItem, getCartCount } from "../thunks/cart";
 

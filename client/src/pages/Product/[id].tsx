@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { RootState } from "@/redux/store";
 import { addToCart, getCartCount } from "@/redux/thunks/cart";
 import { get } from "@/services/api.service";
-import { ProductDetail } from "@/types";
+import { Product, ProductDetail } from "@/types";
 import { ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,19 +12,25 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 const Detail = () => {
   const { id } = useParams<{ id: string }>();
   const [productDetail, setProductDetail] = useState<ProductDetail>();
-  const { user } = useSelector((state: RootState) => state.user);
+  const { info: user } = useSelector((state: RootState) => state.user);
   const { isLogin, token } = useSelector((state: RootState) => state.auth);
+  const { items } = useSelector((state: RootState) => state.cart);
   const { toast } = useToast();
+  const [product, setProduct] = useState<Product | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchProductDetail = async () => {
       const response = await get<{ result: ProductDetail }>(
         `${ENDPOINTS.PRODUCT_DETAIL}/${id}`
       );
+      const product = await get<{ result: Product }>(
+        `${ENDPOINTS.LIST_PRODUCT}/id?id=${id}`
+      );
+      setProduct(product.data.result);
       setProductDetail(response.data.result);
     };
-    fetchProduct();
+    fetchProductDetail();
   }, []);
 
   const dispatch = useDispatch();
@@ -37,7 +43,16 @@ const Detail = () => {
       });
       return;
     }
-
+    const getQuantity: number | undefined = items.find(
+      (item) => item.product.id === id
+    )?.quantity;
+    console.log(getQuantity);
+    if (getQuantity && product?.inStock! - getQuantity <= 0) {
+      toast({
+        title: "Sản phẩm không còn đủ số lượng trong kho",
+      });
+      return;
+    }
     try {
       await dispatch(
         addToCart({
@@ -49,7 +64,12 @@ const Detail = () => {
       toast({
         title: "Thêm vào giỏ hàng thành công",
       });
-      dispatch(getCartCount({ userId: user?.id as string, token: token as string }) as any);
+      dispatch(
+        getCartCount({
+          userId: user?.id as string,
+          token: token as string,
+        }) as any
+      );
     } catch (error) {
       toast({
         title: "Thêm vào giỏ hàng thất bại",
