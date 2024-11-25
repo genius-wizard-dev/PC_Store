@@ -1,15 +1,26 @@
 package com.pc.store.server.configurations;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import org.springframework.core.env.Environment;
 
 @Configuration
+@Slf4j
 public class MyConfiguration {
+
+    @Autowired
+    private Environment env;
+
+
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
@@ -17,5 +28,15 @@ public class MyConfiguration {
         module.addSerializer(ObjectId.class, new ToStringSerializer());
         mapper.registerModule(module);
         return mapper;
+    }
+
+    @Bean
+    public Cloudinary cloudinary() {
+        String secretKey = env.getProperty("API_SECRET");
+        return new Cloudinary(ObjectUtils.asMap(
+                "cloud_name", "dyj2mpgxi",
+                "api_key", "614334546396329",
+                "api_secret", "l-ud5nFPzA1tldYzJ58mOKLIL4k"
+        ));
     }
 }

@@ -28,5 +28,7 @@ public class Product {
     double originalPrice;
     double discountPercent;
     double priceDiscount;
+    int inStock;
     Supplier supplier;
+    boolean isUpdateDetail;
 }

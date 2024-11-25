@@ -24,32 +24,39 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor
 public class ProductService {
 
-    ProductRepository productRespository;
+    ProductRepository productRepository;
     ProductMapper productMapper;
 
     public Page<Product> getProductsByPage(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return productRespository.findAllBy(pageable);
+        return productRepository.findAllBy(pageable);
     }
 
     public Page<Product> getProductsByPageAsc(int page, int size) {
         Pageable pageable =
                 PageRequest.of(page, size, Sort.by("priceAfterDiscount").ascending());
-        return productRespository.findAllBy(pageable);
+        return productRepository.findAllBy(pageable);
     }
 
     public Page<Product> getProductsByPageDesc(int page, int size) {
         Pageable pageable =
                 PageRequest.of(page, size, Sort.by("priceAfterDiscount").descending());
-        return productRespository.findAllBy(pageable);
+        return productRepository.findAllBy(pageable);
     }
 
     public Page<Product> getProductByName(String name, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return productRespository.findByNameContaining(name, pageable);
+        return productRepository.findByNameContaining(name, pageable);
     }
     public ProductResponse getProductById(String id) {
-        Product product = productRespository.findById(new ObjectId(id)).orElseThrow(()-> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        Product product = productRepository.findById(new ObjectId(id)).orElseThrow(()-> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         return productMapper.toProductResponse(product);
+    }
+
+    public boolean updateInStockProduct(ObjectId productId, int quantity){
+        Product product = productRepository.findById(productId).orElseThrow(()-> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        product.setInStock(product.getInStock() - quantity);
+        productRepository.save(product);
+        return true;
     }
 }

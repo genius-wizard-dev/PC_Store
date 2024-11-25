@@ -60,7 +60,12 @@ public class CartService {
                 .filter(item -> item.getProduct().getId().equals(new ObjectId(productId)))
                 .findFirst()
                 .orElseThrow(()-> new AppException(ErrorCode.CART_ITEM_NOT_FOUND));
-        existingItem.setQuantity(existingItem.getQuantity()+1);
+        Product product = productRespository.findById(new ObjectId(productId)).orElse(null);
+        if(product.getInStock() <= existingItem.getQuantity() + 1){
+            throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
+        }else {
+            existingItem.setQuantity(existingItem.getQuantity()+1);
+        }
         return cartRepository.save(cart);
     }
 

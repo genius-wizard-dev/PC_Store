@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Document(collection = "orders")
@@ -30,6 +31,7 @@ public class Order {
     @Field("customer_id")
     Customer customer;
     String shipAddress;
+    String orderDate;
     List<CartItem> items;
     double totalPrice;
     boolean isPaid;

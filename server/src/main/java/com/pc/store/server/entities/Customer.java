@@ -12,6 +12,9 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
+
+import java.util.Set;
 
 @Document(collection = "customers")
 @Data
@@ -35,4 +38,7 @@ public class Customer {
     String email;
     String phoneNumber;
     String password;
+
+    @DocumentReference
+    Set<Role> roles;
 }

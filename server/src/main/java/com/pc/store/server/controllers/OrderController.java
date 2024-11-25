@@ -4,12 +4,16 @@ import com.pc.store.server.dto.request.ApiResponse;
 import com.pc.store.server.dto.request.OrderCreationRequest;
 import com.pc.store.server.entities.Order;
 import com.pc.store.server.services.OrderService;
+import com.pc.store.server.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -19,10 +23,19 @@ import java.util.List;
 @RequestMapping("/api/orders")
 public class OrderController {
     OrderService orderService;
-
+    ProductService productService;
     @PostMapping
     public ApiResponse<Boolean> saveOrder(@RequestBody OrderCreationRequest request){
         log.info(request.toString());
+        request.getItems().forEach(item -> {
+            try{
+                productService.updateInStockProduct(item.getProduct().getId(), item.getQuantity());
+            }catch (Exception e){
+                log.error("Error: {}", e.getMessage());
+            }
+        });
+        if(request.getOrderDate() == null) request.setOrderDate(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .format(LocalDateTime.now(ZoneId.systemDefault())));
         boolean result = orderService.saveOrder(request);
         return ApiResponse.<Boolean>builder().result(result).build();
     }

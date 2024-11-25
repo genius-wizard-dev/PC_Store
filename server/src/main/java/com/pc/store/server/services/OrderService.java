@@ -33,6 +33,7 @@ public class OrderService {
     CartRepository cartRepository;
 
     public boolean saveOrder(OrderCreationRequest request){
+        log.info(request.getCustomerId());
         Customer customer = customerRepository.findById(new ObjectId(request.getCustomerId()))
                 .orElseThrow(()-> new AppException(ErrorCode.CUSTOMER_NOT_FOUND));
         Order order = Order.builder()
@@ -40,6 +41,7 @@ public class OrderService {
                 .shipAddress(request.getShipAddress())
                 .items(request.getItems())
                 .totalPrice(request.getTotalPrice())
+                .orderDate(request.getOrderDate())
                 .orderStatus(OrderStatus.valueOf(request.getOrderStatus()))
                 .isPaid(request.getIsPaid().equals("true"))
                 .build();

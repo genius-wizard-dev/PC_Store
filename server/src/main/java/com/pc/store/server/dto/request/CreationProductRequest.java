@@ -1,22 +1,20 @@
-package com.pc.store.server.dto.response;
+package com.pc.store.server.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import org.bson.types.ObjectId;
-
 import com.pc.store.server.entities.Supplier;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.bson.types.ObjectId;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductResponse {
-    @JsonSerialize(using = ToStringSerializer.class)
-    ObjectId id;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class CreationProductRequest {
     String name;
     String img;
     double priceAfterDiscount;
@@ -24,6 +22,5 @@ public class ProductResponse {
     double discountPercent;
     double priceDiscount;
     int inStock;
-    boolean isUpdateDetail;
     Supplier supplier;
 }
