@@ -19,6 +19,9 @@ const ENDPOINT = {
     ADD_PRODUCT: `/api/admin/add-product`,
     UPDATE_PRODUCT: `/api/admin/update-product`,
     DELETE_PRODUCT: `/api/admin/delete-product`,
+    UPDATE_PRODUCT_DETAIL: `/api/admin/update-product-detail`,
+    LIST_ORDER: `/api/admin/list-orders`,
+    UPDATE_PAYMENT_STATUS: `/api/admin/update-payment-status`,
 }
 
 export default ENDPOINT;

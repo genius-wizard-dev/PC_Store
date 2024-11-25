@@ -12,7 +12,7 @@ function OrderDetail() {
   const { id } = useParams<{ id: string }>();
   const { orders } = useSelector((state: RootState) => state.order);
   const { token } = useSelector((state: RootState) => state.auth);
-  const { user } = useSelector((state: RootState) => state.user);
+  const { info: user } = useSelector((state: RootState) => state.user);
   const order = orders.find((order) => order.id === id);
   const { toast } = useToast();
   const handleAcceptOrder = async () => {

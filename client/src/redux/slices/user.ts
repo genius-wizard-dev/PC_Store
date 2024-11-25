@@ -1,10 +1,9 @@
-import { BaseState } from '@/types/store';
-import { UserInfo, UserInfoResponse } from '@/types/User';
+import { BaseState, User, UserResponse } from '@/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getUserInfo } from '../thunks/user';
 
 interface UserState extends BaseState {
-  info: UserInfo | null;
+  info: User | null;
 }
 
 const initialState: UserState = {
@@ -29,7 +28,7 @@ const userSlice = createSlice({
         state.status = 'loading';
         state.error = null;
       })
-      .addCase(getUserInfo.fulfilled, (state, action: PayloadAction<UserInfoResponse>) => {
+      .addCase(getUserInfo.fulfilled, (state, action: PayloadAction<UserResponse>) => {
         state.status = 'succeeded';
         state.info = action.payload.result;
       })

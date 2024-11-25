@@ -46,7 +46,7 @@ function Cart() {
     () => {
       const initialQuantities: { [key: string]: number } = {};
       items?.forEach((item) => {
-        initialQuantities[item.product.id] = item.quantity;
+        initialQuantities[item.product.id as string] = item.quantity;
       });
       return initialQuantities;
     }
@@ -58,7 +58,7 @@ function Cart() {
     return (
       items?.reduce((total, item) => {
         if (!item?.product?.priceAfterDiscount) return total;
-        const quantity = quantities[item.product.id] || item.quantity;
+        const quantity = quantities[item.product.id as string] || item.quantity;
         return total + item.product.priceAfterDiscount * quantity;
       }, 0) || 0
     );
@@ -258,12 +258,6 @@ function Cart() {
             orderInfo
           )}; path=/; max-age=3600`;
           window.location.href = response.data.result.url;
-          // dispatch(
-          //   getCartCount({
-          //     userId: user?.id as string,
-          //     token: token as string,
-          //   }) as any
-          // );
         } else {
           toast({
             title: "Đặt hàng thất bại vui lòng thử lại",
@@ -304,7 +298,7 @@ function Cart() {
             variant="outline"
             className="hover:text-orange-500 hover:border-orange-500"
           >
-            <Link to="/">Tiếp tục mua sắm</Link>
+            <Link to="/product">Tiếp tục mua sắm</Link>
           </Button>
         </div>
       ) : (

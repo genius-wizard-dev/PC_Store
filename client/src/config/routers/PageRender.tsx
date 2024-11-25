@@ -12,15 +12,9 @@ const PUBLIC_PAGES = [
   "Home",
   "Product",
   "About",
-];
-const USER_PAGES = [
-  ...PUBLIC_PAGES,
-  "Cart",
-  "Order",
-  "Profile",
-  "OrderDetail",
   "Vnpay",
 ];
+const USER_PAGES = [...PUBLIC_PAGES, "Cart", "Order", "Profile", "OrderDetail"];
 const ADMIN_PAGES = [...USER_PAGES, "Admin"];
 
 const PageRender: React.FC = () => {

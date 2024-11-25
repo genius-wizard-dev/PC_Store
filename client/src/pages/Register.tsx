@@ -4,8 +4,11 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { RootState } from "@/redux/store";
 import { register } from "@/redux/thunks/auth";
-import { Auth } from "@/types";
-import { RegisterCredentialsSchema } from "@/types/Auth";
+import {
+  RegisterCredentials,
+  registerCredentialsSchema,
+  RegisterResponse,
+} from "@/types";
 import { Loader2, X } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,7 +18,7 @@ import { z } from "zod";
 export default function Register() {
   const { toast } = useToast();
   const [registerCredentials, setRegisterCredentials] =
-    useState<Auth.RegisterCredentials>({
+    useState<RegisterCredentials>({
       userName: "",
       password: "",
       firstName: "",
@@ -30,9 +33,9 @@ export default function Register() {
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      RegisterCredentialsSchema.parse(registerCredentials);
+      registerCredentialsSchema.parse(registerCredentials);
       const result = await dispatch(
-        register(registerCredentials) as Auth.RegisterResponse | any
+        register(registerCredentials) as RegisterResponse | any
       );
       if (register.fulfilled.match(result)) {
         toast({
@@ -76,7 +79,7 @@ export default function Register() {
         <div className="flex flex-col items-center gap-4">
           <div className="text-center space-y-1">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent">
-             Đăng ký ngay
+              Đăng ký ngay
             </h1>
             <p className="text-sm text-gray-600">
               Nhập thông tin đăng ký của bạn để tạo tài khoản

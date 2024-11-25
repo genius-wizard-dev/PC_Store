@@ -1,5 +1,4 @@
 import { useToast } from "@/hooks/use-toast";
-import { clearAllState } from "@/redux/slices";
 import { RootState } from "@/redux/store";
 import { logout } from "@/redux/thunks/auth";
 import { LogIn, Monitor, ShoppingCart, User, X } from "lucide-react";
@@ -79,7 +78,6 @@ export default function Header() {
         toast({
           title: "Đăng xuất thành công",
         });
-        dispatch(clearAllState() as any);
         navigate("/");
       } else {
         toast({

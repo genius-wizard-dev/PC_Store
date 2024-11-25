@@ -62,6 +62,7 @@ const Product = () => {
     images: [],
     productId: "",
     id: "",
+    imagesUpload: [],
   });
   const [formData, setFormData] = useState<ProductType>({
     name: "",
@@ -132,7 +133,6 @@ const Product = () => {
         ? Number(e.target.value)
         : e.target.value;
 
-      // Automatically calculate priceDiscount and priceAfterDiscount when originalPrice or discountPercent changes
       if (field === "originalPrice" || field === "discountPercent") {
         const originalPrice =
           field === "originalPrice"
@@ -176,14 +176,12 @@ const Product = () => {
       });
     }
   };
-
   const handleSubmit = async () => {
     try {
       if (editingProduct) {
-        const updateProduct = { ...formData, img: formData.img.split(",")[1] };
         await put(
           `${ENDPOINTS.UPDATE_PRODUCT}/${editingProduct.id}`,
-          updateProduct,
+          formData,
           token as string
         );
         toast({
@@ -212,26 +210,22 @@ const Product = () => {
 
   const handleDetailSubmit = async () => {
     try {
-      if (!productDetail) return;
+      if (!detailFormData) return;
+      if (detailFormData.imagesUpload === undefined)
+        detailFormData.imagesUpload = [];
 
-      // Only send non-empty fields in the update
-      const updateData = Object.entries(detailFormData).reduce(
-        (acc, [key, value]) => {
-          if (
-            value !== "" &&
-            value !== null &&
-            (!Array.isArray(value) || value.length > 0)
-          ) {
-            acc[key as keyof ProductDetail] = value;
-          }
-          return acc;
-        },
-        {} as Partial<ProductDetail>
+      const imagesUpload = detailFormData.imagesUpload.map(
+        (url) => url.split(",")[1]
       );
+      const updateData = {
+        ...detailFormData,
+        imagesUpload: imagesUpload,
+      };
 
       await put(
-        `${ENDPOINTS.PRODUCT_DETAIL}/${productDetail.id}/detail`,
-        updateData
+        `${ENDPOINTS.UPDATE_PRODUCT_DETAIL}`,
+        updateData,
+        token as string
       );
 
       toast({
@@ -290,6 +284,7 @@ const Product = () => {
         images: detail.images || [],
         productId: detail.productId || "",
         id: detail.id || "",
+        imagesUpload: [],
       });
 
       setIsDetailOpen(true);
@@ -350,7 +345,8 @@ const Product = () => {
         const base64String = reader.result as string;
         setDetailFormData({
           ...detailFormData,
-          images: [...detailFormData.images, base64String],
+          images: [...detailFormData.images],
+          imagesUpload: [...(detailFormData.imagesUpload || []), base64String],
         });
       };
 
@@ -358,11 +354,18 @@ const Product = () => {
     }
   };
 
-  const handleRemoveImage = (index: number) => {
-    setDetailFormData({
-      ...detailFormData,
-      images: detailFormData.images.filter((_, i) => i !== index),
-    });
+  const handleRemoveImage = (index: number, type: string) => {
+    if (type === "image") {
+      setDetailFormData({
+        ...detailFormData,
+        images: detailFormData.images.filter((_, i) => i !== index),
+      });
+    } else if (type === "imagesUpload" && detailFormData.imagesUpload) {
+      setDetailFormData({
+        ...detailFormData,
+        imagesUpload: detailFormData.imagesUpload.filter((_, i) => i !== index),
+      });
+    }
   };
 
   const handleProductImageUpload = async (
@@ -587,7 +590,7 @@ const Product = () => {
                     size="icon"
                     onClick={() => {
                       setEditingProduct(product);
-                      fetchProductDetail(product.id);
+                      fetchProductDetail(product.id as string);
                     }}
                   >
                     <Settings className="h-4 w-4" />
@@ -595,7 +598,7 @@ const Product = () => {
                   <Button
                     variant="destructive"
                     size="icon"
-                    onClick={() => handleDelete(product.id)}
+                    onClick={() => handleDelete(product.id as string)}
                   >
                     <Trash className="h-4 w-4" />
                   </Button>
@@ -632,6 +635,7 @@ const Product = () => {
           if (!open) {
             setProductDetail(null);
             setDetailFormData({
+              id: "",
               processor: "",
               ram: "",
               storage: "",
@@ -642,6 +646,8 @@ const Product = () => {
               coolingSystem: "",
               operatingSystem: "",
               images: [],
+              imagesUpload: [],
+              productId: "",
             });
           }
         }}
@@ -689,12 +695,31 @@ const Product = () => {
                       variant="destructive"
                       size="icon"
                       className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => handleRemoveImage(index)}
+                      onClick={() => handleRemoveImage(index, "image")}
                     >
                       <Trash className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
+                {detailFormData.imagesUpload &&
+                  detailFormData.imagesUpload.map((image, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={image}
+                        alt={`Product ${index + 1}`}
+                        className="w-full aspect-square object-cover rounded-md"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => handleRemoveImage(index, "imagesUpload")}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
               </div>
             </div>
 

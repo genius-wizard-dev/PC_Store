@@ -1,10 +1,9 @@
-import { ListOrderResponse, Result } from "@/types/Order";
-import { BaseState } from "@/types/store";
+import { BaseState, Order, OrderResponse } from "@/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { viewOrder } from "../thunks/order";
 
 interface OrderState extends BaseState {
-  orders: Result[]
+  orders: Order[]
 }
 
 const initialState: OrderState = {
@@ -23,7 +22,7 @@ const orderSlice = createSlice({
         state.status = "loading"
         state.error = null
       })
-      .addCase(viewOrder.fulfilled, (state, action: PayloadAction<ListOrderResponse>) => {
+      .addCase(viewOrder.fulfilled, (state, action: PayloadAction<OrderResponse>) => {
         state.status = "succeeded";
         state.orders = action.payload.result.map(order => ({
             ...order,

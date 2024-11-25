@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks";
 import { RootState } from "@/redux/store";
 import { getCustomer, setIsAdmin } from "@/redux/thunks/admin";
-import { Role } from "@/types/User";
+import { Role } from "@/types";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 const Customer = () => {
@@ -83,42 +83,47 @@ const Customer = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {customers.map((customer, index) => (
-                  <tr key={customer.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {customer.userName}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {customer.firstName} {customer.lastName}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {customer.email}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {customer.phoneNumber}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {customer.roles.map((role: Role) => role.name).join(", ")}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Button
-                        variant="default"
-                        onClick={() => handleSetIsAdmin(customer.userName)}
-                        disabled={checkIsAdmin(customer.roles)}
-                        className={`w-full ${
-                          checkIsAdmin(customer.roles)
-                            ? "bg-gradient-to-r from-gray-300 to-gray-400 text-gray-600 cursor-not-allowed"
-                            : "bg-gradient-to-r from-orange-400 to-red-500 text-white hover:from-orange-500 hover:to-red-600"
-                        } transition-all duration-300`}
-                      >
-                        {checkIsAdmin(customer.roles)
-                          ? "Đã là Admin"
-                          : "Cấp quyền Admin"}
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
+                {customers?.result.content &&
+                  customers.result.content.map((customer, index) => (
+                    <tr key={customer.id}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {index + 1}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {customer.userName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {customer.firstName} {customer.lastName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {customer.email}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {customer.phoneNumber}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {customer.roles
+                          .map((role: Role) => role.name)
+                          .join(", ")}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Button
+                          variant="default"
+                          onClick={() => handleSetIsAdmin(customer.userName)}
+                          disabled={checkIsAdmin(customer.roles)}
+                          className={`w-full ${
+                            checkIsAdmin(customer.roles)
+                              ? "bg-gradient-to-r from-gray-300 to-gray-400 text-gray-600 cursor-not-allowed"
+                              : "bg-gradient-to-r from-orange-400 to-red-500 text-white hover:from-orange-500 hover:to-red-600"
+                          } transition-all duration-300`}
+                        >
+                          {checkIsAdmin(customer.roles)
+                            ? "Đã là Admin"
+                            : "Cấp quyền Admin"}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
