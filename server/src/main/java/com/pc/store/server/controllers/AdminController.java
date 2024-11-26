@@ -1,5 +1,10 @@
 package com.pc.store.server.controllers;
 
+import java.util.Base64;
+
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
+
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.pc.store.server.dto.request.ApiResponse;
@@ -7,21 +12,15 @@ import com.pc.store.server.dto.request.CreationProductRequest;
 import com.pc.store.server.dto.request.UpdateProductDetailReq;
 import com.pc.store.server.dto.response.ProductDetailResponse;
 import com.pc.store.server.dto.response.ProductResponse;
-import com.pc.store.server.dto.response.UpdateProductDetailResponse;
 import com.pc.store.server.entities.Customer;
 import com.pc.store.server.entities.Order;
 import com.pc.store.server.exception.AppException;
 import com.pc.store.server.exception.ErrorCode;
 import com.pc.store.server.services.AdminService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -55,15 +54,18 @@ public class AdminController {
                 base64Image = base64Image.substring(base64Image.indexOf(",") + 1);
             }
             byte[] imageBytes = Base64.getDecoder().decode(base64Image);
-            String imageUrl = cloudinary.uploader().upload(imageBytes, ObjectUtils.asMap(
-                    "resource_type", "image",
-                    "folder", "PC_Store"
-            )).get("url").toString();
+            String imageUrl = cloudinary
+                    .uploader()
+                    .upload(
+                            imageBytes,
+                            ObjectUtils.asMap(
+                                    "resource_type", "image",
+                                    "folder", "PC_Store"))
+                    .get("url")
+                    .toString();
             request.setImg(imageUrl);
             var result = adminService.addProduct(request);
-            return ApiResponse.<ProductResponse>builder()
-                    .result(result)
-                    .build();
+            return ApiResponse.<ProductResponse>builder().result(result).build();
         } catch (Exception e) {
             e.printStackTrace();
             throw new AppException(ErrorCode.UPLOAD_IMAGE_FAILED);
@@ -71,22 +73,26 @@ public class AdminController {
     }
 
     @PutMapping("/update-product/{id}")
-    public ApiResponse<ProductResponse> updateProduct(@PathVariable String id, @RequestBody CreationProductRequest request) {
+    public ApiResponse<ProductResponse> updateProduct(
+            @PathVariable String id, @RequestBody CreationProductRequest request) {
         try {
             String base64Image = request.getImg();
             if (base64Image.startsWith("data:image")) {
                 base64Image = base64Image.substring(base64Image.indexOf(",") + 1);
             }
             byte[] imageBytes = Base64.getDecoder().decode(base64Image);
-            String imageUrl = cloudinary.uploader().upload(imageBytes, ObjectUtils.asMap(
-                    "resource_type", "image",
-                    "folder", "PC_Store"
-            )).get("url").toString();
+            String imageUrl = cloudinary
+                    .uploader()
+                    .upload(
+                            imageBytes,
+                            ObjectUtils.asMap(
+                                    "resource_type", "image",
+                                    "folder", "PC_Store"))
+                    .get("url")
+                    .toString();
             request.setImg(imageUrl);
             var result = adminService.updateProduct(request, id);
-            return ApiResponse.<ProductResponse>builder()
-                    .result(result)
-                    .build();
+            return ApiResponse.<ProductResponse>builder().result(result).build();
         } catch (Exception e) {
             e.printStackTrace();
             throw new AppException(ErrorCode.UPLOAD_IMAGE_FAILED);
@@ -95,24 +101,27 @@ public class AdminController {
 
     @PutMapping("/update-product-detail")
     public ApiResponse<ProductDetailResponse> updateDetail(@RequestBody UpdateProductDetailReq request) {
-        try{
+        try {
             log.info("ok");
             for (String base64Image : request.getImagesUpload()) {
                 if (base64Image.startsWith("data:image")) {
                     base64Image = base64Image.substring(base64Image.indexOf(",") + 1);
                 }
                 byte[] imageBytes = Base64.getDecoder().decode(base64Image);
-                String imageUrl = cloudinary.uploader().upload(imageBytes, ObjectUtils.asMap(
-                        "resource_type", "image",
-                        "folder", "PC_Store"
-                )).get("url").toString();
+                String imageUrl = cloudinary
+                        .uploader()
+                        .upload(
+                                imageBytes,
+                                ObjectUtils.asMap(
+                                        "resource_type", "image",
+                                        "folder", "PC_Store"))
+                        .get("url")
+                        .toString();
                 request.getImages().add(imageUrl);
             }
             var result = adminService.updateDetail(request);
-            return ApiResponse.<ProductDetailResponse>builder()
-                    .result(result)
-                    .build();
-        }catch (Exception e){
+            return ApiResponse.<ProductDetailResponse>builder().result(result).build();
+        } catch (Exception e) {
             e.printStackTrace();
             throw new AppException(ErrorCode.UPLOAD_IMAGE_FAILED);
         }
@@ -120,16 +129,14 @@ public class AdminController {
 
     @DeleteMapping("/delete-product/{id}")
     public ApiResponse<Boolean> deleteProduct(@PathVariable String id) {
-       boolean result = adminService.deleteProduct(id);
+        boolean result = adminService.deleteProduct(id);
         return ApiResponse.<Boolean>builder().result(result).build();
     }
 
     @GetMapping("/list-orders")
     public ApiResponse<Page<Order>> getOrders(@RequestParam(defaultValue = "0") int page) {
         var result = adminService.getOrders(page);
-        return ApiResponse.<Page<Order>>builder()
-                .result(result)
-                .build();
+        return ApiResponse.<Page<Order>>builder().result(result).build();
     }
 
     @PutMapping("/update-payment-status/{id}")
@@ -138,5 +145,4 @@ public class AdminController {
                 .result(adminService.updatePaymentStatus(id))
                 .build();
     }
-
 }

@@ -2,7 +2,6 @@ package com.pc.store.server.dao;
 
 import java.util.Optional;
 
-import com.pc.store.server.dto.response.CustomerResponse;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

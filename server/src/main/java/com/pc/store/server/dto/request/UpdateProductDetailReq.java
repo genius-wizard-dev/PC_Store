@@ -1,14 +1,9 @@
 package com.pc.store.server.dto.request;
 
+import java.util.List;
 
-import com.pc.store.server.entities.Product;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
-import org.springframework.data.mongodb.core.mapping.Field;
-
-import java.util.List;
 
 @Data
 @Builder

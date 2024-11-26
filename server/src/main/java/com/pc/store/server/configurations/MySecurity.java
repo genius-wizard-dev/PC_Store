@@ -15,9 +15,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-
-
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -27,7 +24,8 @@ public class MySecurity {
         "/api/customers/register", "/api/auth/log-in", "/api/auth/introspect", "/api/auth/logout", "/api/auth/refresh",
     };
     private final String[] PUBLIC_ENDPOINTS_GET = {
-        "/api/products", "/api/products/id",
+        "/api/products",
+        "/api/products/id",
         "/api/products/asc",
         "/api/products/desc",
         "/api/products/{name}",
@@ -36,21 +34,20 @@ public class MySecurity {
         "/api/payment/create_payment",
     };
 
-//    private  final String [] PUBLIC_ENDPOINTS_OPTIONS={
-//            "/api/customers/register", "/api/auth/log-in", "/api/auth/introspect", "/api/auth/logout", "/api/auth/refresh",
-//            "/api/products",
-//            "/api/products/asc",
-//            "/api/products/desc",
-//            "/api/products/{name}",
-//            "/api/product-detail/{id}",
-//            "/api/product-detail",
-//            "/api/customers/info"
-//    };
+    //    private  final String [] PUBLIC_ENDPOINTS_OPTIONS={
+    //            "/api/customers/register", "/api/auth/log-in", "/api/auth/introspect", "/api/auth/logout",
+    // "/api/auth/refresh",
+    //            "/api/products",
+    //            "/api/products/asc",
+    //            "/api/products/desc",
+    //            "/api/products/{name}",
+    //            "/api/product-detail/{id}",
+    //            "/api/product-detail",
+    //            "/api/customers/info"
+    //    };
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
-
-
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -63,14 +60,14 @@ public class MySecurity {
                 .permitAll()
                 .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS_GET)
                 .permitAll()
-//                .requestMatchers(HttpMethod.OPTIONS, PUBLIC_ENDPOINTS_OPTIONS)
-//                .permitAll()
-                .requestMatchers("/api/admin/").hasRole("ADMIN")
+                //                .requestMatchers(HttpMethod.OPTIONS, PUBLIC_ENDPOINTS_OPTIONS)
+                //                .permitAll()
+                .requestMatchers("/api/admin/")
+                .hasRole("ADMIN")
                 .anyRequest()
                 .authenticated());
-        httpSecurity.oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.decoder(customJwtDecoder)
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                )
+        httpSecurity.oauth2ResourceServer(oauth -> oauth.jwt(
+                        jwt -> jwt.decoder(customJwtDecoder).jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
@@ -83,5 +80,4 @@ public class MySecurity {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }
-
 }

@@ -19,8 +19,7 @@ public enum ErrorCode {
     CART_ITEM_NOT_FOUND(3002, "Cart item not found", HttpStatus.NOT_FOUND),
     ORDER_NOT_FOUND(4001, "Order not found", HttpStatus.NOT_FOUND),
     ROLE_NOT_EXISTED(5001, "Role not existed", HttpStatus.NOT_FOUND),
-    PRODUCT_OUT_OF_STOCK(6001, "Product out of stock", HttpStatus.BAD_REQUEST)
-    ;
+    PRODUCT_OUT_OF_STOCK(6001, "Product out of stock", HttpStatus.BAD_REQUEST);
 
     ErrorCode(int code, String message, HttpStatus httpStatus) {
         this.code = code;

@@ -1,22 +1,25 @@
 package com.pc.store.server.controllers;
 
-import com.pc.store.server.configurations.VNPayConfig;
-import com.pc.store.server.dto.request.ApiResponse;
-import com.pc.store.server.dto.request.PaymentRequest;
-import com.pc.store.server.dto.response.PaymentResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.pc.store.server.configurations.VNPayConfig;
+import com.pc.store.server.dto.request.ApiResponse;
+import com.pc.store.server.dto.request.PaymentRequest;
+import com.pc.store.server.dto.response.PaymentResponse;
+
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -25,11 +28,11 @@ import java.util.*;
 public class PaymentController {
 
     @GetMapping("/create_payment")
-    public ApiResponse<?> createPayment(HttpServletRequest request, @RequestParam(value = "amount") String amount) throws UnsupportedEncodingException {
+    public ApiResponse<?> createPayment(HttpServletRequest request, @RequestParam(value = "amount") String amount)
+            throws UnsupportedEncodingException {
 
         String orderType = "other";
-       long amountInt = Integer.parseInt(amount)* 100L;
-
+        long amountInt = Integer.parseInt(amount) * 100L;
 
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
         String vnp_IpAddr = VNPayConfig.getIpAddress(request);
@@ -67,11 +70,11 @@ public class PaymentController {
             String fieldName = (String) itr.next();
             String fieldValue = vnp_Params.get(fieldName);
             if ((fieldValue != null) && (!fieldValue.isEmpty())) {
-                //Build hash data
+                // Build hash data
                 hashData.append(fieldName);
                 hashData.append('=');
                 hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                //Build query
+                // Build query
                 query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
                 query.append('=');
                 query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
@@ -91,15 +94,26 @@ public class PaymentController {
                 .message("Successfully")
                 .URL(paymentUrl)
                 .build();
-    return ApiResponse.builder().result(payment).build();
-
+        return ApiResponse.builder().result(payment).build();
     }
+
     @RequestMapping("/payment_status")
-    public ApiResponse<PaymentResponse> getPaymentInfo(@RequestParam(value = "vnp_ResponseCode") String vnp_ResponseCode){
-        if(vnp_ResponseCode.equals("00")){
-            return ApiResponse.<PaymentResponse>builder().result(PaymentResponse.builder().status("YES").message("Successfully").build()).build();
-        }else{
-            return ApiResponse.<PaymentResponse>builder().result(PaymentResponse.builder().status("NO").message("Failed").build()).build();
+    public ApiResponse<PaymentResponse> getPaymentInfo(
+            @RequestParam(value = "vnp_ResponseCode") String vnp_ResponseCode) {
+        if (vnp_ResponseCode.equals("00")) {
+            return ApiResponse.<PaymentResponse>builder()
+                    .result(PaymentResponse.builder()
+                            .status("YES")
+                            .message("Successfully")
+                            .build())
+                    .build();
+        } else {
+            return ApiResponse.<PaymentResponse>builder()
+                    .result(PaymentResponse.builder()
+                            .status("NO")
+                            .message("Failed")
+                            .build())
+                    .build();
         }
     }
 }

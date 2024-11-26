@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -34,7 +35,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -158,8 +158,8 @@ public class AuthenticationService {
 
     private String buildScope(Customer customer) {
         StringJoiner stringJoiner = new StringJoiner(" ");
-        if(!CollectionUtils.isEmpty(customer.getRoles())){
-            customer.getRoles().forEach(role -> stringJoiner.add("ROLE_"+role.getName()));
+        if (!CollectionUtils.isEmpty(customer.getRoles())) {
+            customer.getRoles().forEach(role -> stringJoiner.add("ROLE_" + role.getName()));
         }
         return stringJoiner.toString();
     }

@@ -1,9 +1,5 @@
 package com.pc.store.server.services;
 
-import java.util.List;
-
-import com.pc.store.server.exception.AppException;
-import com.pc.store.server.exception.ErrorCode;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +10,8 @@ import org.springframework.stereotype.Service;
 import com.pc.store.server.dao.ProductRepository;
 import com.pc.store.server.dto.response.ProductResponse;
 import com.pc.store.server.entities.Product;
+import com.pc.store.server.exception.AppException;
+import com.pc.store.server.exception.ErrorCode;
 import com.pc.store.server.mapper.ProductMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -48,13 +46,17 @@ public class ProductService {
         Pageable pageable = PageRequest.of(page, size);
         return productRepository.findByNameContaining(name, pageable);
     }
+
     public ProductResponse getProductById(String id) {
-        Product product = productRepository.findById(new ObjectId(id)).orElseThrow(()-> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        Product product = productRepository
+                .findById(new ObjectId(id))
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         return productMapper.toProductResponse(product);
     }
 
-    public boolean updateInStockProduct(ObjectId productId, int quantity){
-        Product product = productRepository.findById(productId).orElseThrow(()-> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+    public boolean updateInStockProduct(ObjectId productId, int quantity) {
+        Product product =
+                productRepository.findById(productId).orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         product.setInStock(product.getInStock() - quantity);
         productRepository.save(product);
         return true;

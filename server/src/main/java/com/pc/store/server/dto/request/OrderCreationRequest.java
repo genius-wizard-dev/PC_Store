@@ -1,13 +1,12 @@
 package com.pc.store.server.dto.request;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pc.store.server.entities.CartItem;
-import com.pc.store.server.entities.OrderStatus;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Builder

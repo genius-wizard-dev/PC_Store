@@ -1,8 +1,8 @@
 package com.pc.store.server.mapper;
 
-import com.pc.store.server.dto.request.CreationProductRequest;
 import org.mapstruct.Mapper;
 
+import com.pc.store.server.dto.request.CreationProductRequest;
 import com.pc.store.server.dto.response.ProductResponse;
 import com.pc.store.server.entities.Product;
 
