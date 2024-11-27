@@ -19,6 +19,7 @@ const clearAuthState = (state: AuthState): void => {
   state.isLogin = false;
   state.error = null;
   localStorage.removeItem('token');
+  localStorage.removeItem('addressShipping');
 };
 
 const authSlice = createSlice({

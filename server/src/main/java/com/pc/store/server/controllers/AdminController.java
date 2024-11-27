@@ -77,20 +77,28 @@ public class AdminController {
             @PathVariable String id, @RequestBody CreationProductRequest request) {
         try {
             String base64Image = request.getImg();
-            if (base64Image.startsWith("data:image")) {
+            String imageUrl;
+            if (base64Image.startsWith("http://") || base64Image.startsWith("https://")) {
+                imageUrl = base64Image;
+            } else if (base64Image.startsWith("data:image")) {
                 base64Image = base64Image.substring(base64Image.indexOf(",") + 1);
+                byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+
+                imageUrl = cloudinary
+                        .uploader()
+                        .upload(
+                                imageBytes,
+                                ObjectUtils.asMap(
+                                        "resource_type", "image",
+                                        "folder", "PC_Store"))
+                        .get("url")
+                        .toString();
+            } else {
+                throw new AppException(ErrorCode.UPLOAD_IMAGE_FAILED);
             }
-            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
-            String imageUrl = cloudinary
-                    .uploader()
-                    .upload(
-                            imageBytes,
-                            ObjectUtils.asMap(
-                                    "resource_type", "image",
-                                    "folder", "PC_Store"))
-                    .get("url")
-                    .toString();
+
             request.setImg(imageUrl);
+
             var result = adminService.updateProduct(request, id);
             return ApiResponse.<ProductResponse>builder().result(result).build();
         } catch (Exception e) {

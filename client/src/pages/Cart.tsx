@@ -41,7 +41,10 @@ function Cart() {
     {}
   );
   const [showAddressModal, setShowAddressModal] = useState(false);
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState(
+    localStorage.getItem("addressShipping") || ""
+  );
+
   const [quantities, setQuantities] = useState<{ [key: string]: number }>(
     () => {
       const initialQuantities: { [key: string]: number } = {};
@@ -335,9 +338,11 @@ function Cart() {
                         variant="outline"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => handleDecreaseQuantity(item.product.id as string)}
+                        onClick={() =>
+                          handleDecreaseQuantity(item.product.id as string)
+                        }
                         disabled={
-                          quantities[item.product.id as string]  <= 1 ||
+                          quantities[item.product.id as string] <= 1 ||
                           loadingItems[item.product.id as string]
                         }
                       >
@@ -350,7 +355,9 @@ function Cart() {
                         variant="outline"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => handleIncreaseQuantity(item.product.id as string)}
+                        onClick={() =>
+                          handleIncreaseQuantity(item.product.id as string)
+                        }
                         disabled={loadingItems[item.product.id as string]}
                       >
                         <Plus className="h-4 w-4" />
@@ -359,7 +366,9 @@ function Cart() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 ml-auto text-muted-foreground hover:text-red-500"
-                        onClick={() => handleDeleteCartItem(item.product.id as string)}
+                        onClick={() =>
+                          handleDeleteCartItem(item.product.id as string)
+                        }
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -439,7 +448,7 @@ function Cart() {
                           className="sr-only"
                         />
                         <span className="text-sm text-center">
-                          Thanh toán VNPay
+                          Thanh toán bằng VNPay
                         </span>
                       </Label>
                     </div>
@@ -499,7 +508,10 @@ function Cart() {
             className="min-h-[100px] resize-none"
             placeholder="Nhập địa chỉ giao hàng của bạn"
             value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            onChange={(e) => {
+              setAddress(e.target.value);
+              localStorage.setItem("addressShipping", e.target.value);
+            }}
           />
           <DialogFooter>
             <Button

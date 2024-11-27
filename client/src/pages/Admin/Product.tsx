@@ -45,6 +45,9 @@ const Product = () => {
   const [editingProduct, setEditingProduct] = useState<ProductType | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const { token } = useSelector((state: RootState) => state.auth);
   // const [productDetail, setProductDetail] = useState<ProductDetail | null>(
   //   null
@@ -178,6 +181,7 @@ const Product = () => {
   };
   const handleSubmit = async () => {
     try {
+      setIsLoading(true);
       if (editingProduct) {
         await put(
           `${ENDPOINTS.UPDATE_PRODUCT}/${editingProduct.id}`,
@@ -205,11 +209,14 @@ const Product = () => {
         description: "Failed to save product",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleDetailSubmit = async () => {
     try {
+      setIsDetailLoading(true);
       if (!detailFormData) return;
       if (detailFormData.imagesUpload === undefined)
         detailFormData.imagesUpload = [];
@@ -241,6 +248,8 @@ const Product = () => {
         description: "Failed to update product detail",
         variant: "destructive",
       });
+    } finally {
+      setIsDetailLoading(false);
     }
   };
 
@@ -300,6 +309,7 @@ const Product = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm("Bạn có chắc là muốn xóa sản phẩm này?")) {
       try {
+        setIsDeleting(id);
         await del(`${ENDPOINTS.DELETE_PRODUCT}/${id}`, {}, token as string);
         toast({
           title: "Success",
@@ -312,6 +322,8 @@ const Product = () => {
           description: "Failed to delete product",
           variant: "destructive",
         });
+      } finally {
+        setIsDeleting(null);
       }
     }
   };
@@ -536,8 +548,12 @@ const Product = () => {
                   />
                 </div>
               </div>
-              <Button onClick={handleSubmit}>
-                {editingProduct ? "Update Product" : "Add Product"}
+              <Button onClick={handleSubmit} disabled={isLoading}>
+                {isLoading
+                  ? "Loading..."
+                  : editingProduct
+                  ? "Update Product"
+                  : "Add Product"}
               </Button>
             </div>
           </DialogContent>
@@ -582,6 +598,7 @@ const Product = () => {
                     variant="outline"
                     size="icon"
                     onClick={() => handleEdit(product)}
+                    disabled={isLoading}
                   >
                     <Pencil className="h-4 w-4" />
                   </Button>
@@ -592,6 +609,7 @@ const Product = () => {
                       setEditingProduct(product);
                       fetchProductDetail(product.id as string);
                     }}
+                    disabled={isDetailLoading}
                   >
                     <Settings className="h-4 w-4" />
                   </Button>
@@ -599,8 +617,13 @@ const Product = () => {
                     variant="destructive"
                     size="icon"
                     onClick={() => handleDelete(product.id as string)}
+                    disabled={isDeleting === product.id}
                   >
-                    <Trash className="h-4 w-4" />
+                    {isDeleting === product.id ? (
+                      "..."
+                    ) : (
+                      <Trash className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </TableCell>
