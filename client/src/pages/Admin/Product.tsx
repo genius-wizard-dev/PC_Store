@@ -46,9 +46,9 @@ const Product = () => {
     null
   );
   const { token } = useSelector((state: RootState) => state.auth);
-  const [productDetail, setProductDetail] = useState<ProductDetail | null>(
-    null
-  );
+  // const [productDetail, setProductDetail] = useState<ProductDetail | null>(
+  //   null
+  // );
   const [detailFormData, setDetailFormData] = useState<ProductDetail>({
     processor: "",
     ram: "",
@@ -269,7 +269,7 @@ const Product = () => {
       );
 
       const detail = response.data.result;
-      setProductDetail(detail);
+      // setProductDetail(detail);
 
       setDetailFormData({
         processor: detail.processor || "",
@@ -633,7 +633,7 @@ const Product = () => {
         onOpenChange={(open) => {
           setIsDetailOpen(open);
           if (!open) {
-            setProductDetail(null);
+            // setProductDetail(null);
             setDetailFormData({
               id: "",
               processor: "",

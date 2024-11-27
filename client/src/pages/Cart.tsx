@@ -335,23 +335,23 @@ function Cart() {
                         variant="outline"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => handleDecreaseQuantity(item.product.id)}
+                        onClick={() => handleDecreaseQuantity(item.product.id as string)}
                         disabled={
-                          quantities[item.product.id] <= 1 ||
-                          loadingItems[item.product.id]
+                          quantities[item.product.id as string]  <= 1 ||
+                          loadingItems[item.product.id as string]
                         }
                       >
                         <Minus className="h-4 w-4" />
                       </Button>
                       <span className="w-8 text-center">
-                        {quantities[item.product.id]}
+                        {quantities[item.product.id as string]}
                       </span>
                       <Button
                         variant="outline"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => handleIncreaseQuantity(item.product.id)}
-                        disabled={loadingItems[item.product.id]}
+                        onClick={() => handleIncreaseQuantity(item.product.id as string)}
+                        disabled={loadingItems[item.product.id as string]}
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
@@ -359,7 +359,7 @@ function Cart() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 ml-auto text-muted-foreground hover:text-red-500"
-                        onClick={() => handleDeleteCartItem(item.product.id)}
+                        onClick={() => handleDeleteCartItem(item.product.id as string)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
