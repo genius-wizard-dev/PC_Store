@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 const pages: any = import.meta.glob([
+  "../../pages/**/*.tsx",
   "../../pages/*.tsx",
   "../../pages/Admin/*.tsx",
   "../../pages/Vnpay/*.tsx",
