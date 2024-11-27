@@ -173,7 +173,7 @@ const OrderPage = () => {
                   })}
                 </TableCell>
                 <TableCell className="font-medium">
-                  ${order.totalPrice.toLocaleString()}
+                  {order.totalPrice.toLocaleString()} VNĐ
                 </TableCell>
                 <TableCell>
                   <Badge
