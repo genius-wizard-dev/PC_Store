@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.pc.store.server.entities.ProductDetail;
 
 @Repository
-public interface ProductDetailRepository extends MongoRepository<ProductDetail, String> {
+public interface ProductDetailRepository extends MongoRepository<ProductDetail, ObjectId> {
 
     Optional<ProductDetail> findByProductId(ObjectId id);
 }

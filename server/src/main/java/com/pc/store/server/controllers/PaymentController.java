@@ -8,6 +8,10 @@ import java.util.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +29,12 @@ import lombok.experimental.FieldDefaults;
 @RequestMapping("/api/payment")
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class PaymentController {
+
+    @NonFinal
+    @Value("${vnp.return.url}")
+    public String vnp_ReturnUrl;
 
     @GetMapping("/create_payment")
     public ApiResponse<?> createPayment(HttpServletRequest request, @RequestParam(value = "amount") String amount)
@@ -38,7 +47,6 @@ public class PaymentController {
         String vnp_IpAddr = VNPayConfig.getIpAddress(request);
 
         String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
-
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", VNPayConfig.vnp_Version);
         vnp_Params.put("vnp_Command", VNPayConfig.vnp_Command);
@@ -49,7 +57,7 @@ public class PaymentController {
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
         vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
         vnp_Params.put("vnp_Locale", "vn");
-        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl);
+        vnp_Params.put("vnp_ReturnUrl", vnp_ReturnUrl);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
         vnp_Params.put("vnp_OrderType", orderType);
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));

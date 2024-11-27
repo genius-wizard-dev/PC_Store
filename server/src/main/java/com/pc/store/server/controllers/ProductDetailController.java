@@ -25,7 +25,6 @@ public class ProductDetailController {
     public ApiResponse<ProductDetailResponse> getProductDetail(@PathVariable String id) {
 
         var result = pdService.getProductDetail(id);
-        log.info(result.getPowerSupply());
         return ApiResponse.<ProductDetailResponse>builder().result(result).build();
     }
 }

@@ -91,11 +91,11 @@ public class AdminService {
     }
 
     public ProductDetailResponse updateDetail(UpdateProductDetailReq request) {
-        ProductDetail detail = new ProductDetail();
+        ProductDetail detail = productDetailRepository.findByProductId(new ObjectId(request.getProductId())).orElseThrow(() -> new AppException(ErrorCode.PRODUCT_DETAIL_NOT_FOUND));
         Product product = productRepository
                 .findById(new ObjectId(request.getProductId()))
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
-        detail.setId(request.getId());
+        product.setUpdateDetail(true);
         detail.setImages(request.getImages());
         detail.setProcessor(request.getProcessor());
         detail.setProduct(product);
@@ -107,6 +107,7 @@ public class AdminService {
         detail.setCase_(request.getCase_());
         detail.setCoolingSystem(request.getCoolingSystem());
         detail.setOperatingSystem(request.getOperatingSystem());
+        productRepository.save(product);
         productDetailRepository.save(detail);
         return productDetailMapper.toProductDetailResponse(detail);
     }

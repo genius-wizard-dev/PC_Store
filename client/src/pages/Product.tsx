@@ -160,7 +160,7 @@ function ProductPage() {
           <option value="all">Tất cả</option>
         </select>
       </div>
-
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
         {products.map((product: Product) => (
           <div
@@ -171,7 +171,7 @@ function ProductPage() {
                 : "opacity-80 cursor-not-allowed"
             }`}
           >
-            {product.updateDetail ? (
+            { product.updateDetail ? (
               <Link to={`/product/${product.id}`} className="block">
                 <div className="relative">
                   <img
