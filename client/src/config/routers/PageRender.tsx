@@ -1,23 +1,17 @@
-import { NotFound } from "@/pages";
 import { RootState } from "@/redux/store";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 const pages: any = import.meta.glob([
-  "../../pages/**/*.tsx",
-  "!../../pages/common/**",
+  "../../pages/*.tsx",
+  "../../pages/Admin/*.tsx",
+  "../../pages/Vnpay/*.tsx",
+  "!../../pages/common/**/*.tsx",
+  "!../../pages/index.ts",
 ]);
 
-const PUBLIC_PAGES = [
-  "Login",
-  "Register",
-  "NotFound",
-  "Home",
-  "Product",
-  "About",
-  "Vnpay",
-];
+const PUBLIC_PAGES = ["Login", "Register", "Home", "Product", "About", "Vnpay"];
 const USER_PAGES = [...PUBLIC_PAGES, "Cart", "Order", "Profile", "OrderDetail"];
 const ADMIN_PAGES = [...USER_PAGES, "Admin"];
 
@@ -42,24 +36,25 @@ const PageRender: React.FC = () => {
       try {
         const formatPage = page.charAt(0).toUpperCase() + page.slice(1);
         let pagePath = `../../pages/${formatPage}.tsx`;
-        console.log(formatPage);
+        console.log("Attempting to load page:", formatPage, pagePath);
 
         if (id && formatPage !== "Admin") {
           pagePath = `../../pages/${formatPage}/[id].tsx`;
-        } else if (
-          formatPage === "Vnpay" &&
-          searchParams.get("vnp_ResponseCode")
-        ) {
-          pagePath = `../../pages/${formatPage}/PaymentResult.tsx`;
+        } else if (formatPage === "Vnpay") {
+          if (searchParams.get("vnp_ResponseCode")) {
+            pagePath = "../../pages/Vnpay/index.tsx";
+          }
         } else if (formatPage === "Admin") {
           const subPage = id
             ? id.charAt(0).toUpperCase() + id.slice(1)
             : "Index";
-          console.log(subPage);
-          pagePath = `../../pages/${formatPage}/${subPage}.tsx`;
+          pagePath = `../../pages/Admin/${subPage}.tsx`;
         }
 
+        console.log("Final path:", pagePath);
         if (!pages[pagePath]) {
+          console.error("Page not found:", pagePath);
+          console.log("Available pages:", Object.keys(pages));
           setNotFound(true);
           setComponent(null);
           return;
@@ -100,10 +95,26 @@ const PageRender: React.FC = () => {
     loadComponent();
   }, [page, id, isLogin, user, location.pathname, location.search, navigate]);
 
-  if (notFound) return <NotFound />;
-  if (Component) return <Component />;
-
-  return null;
+  return (
+    <div className="container mx-auto">
+      {notFound ? (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold mb-4">404</h1>
+            <p className="text-gray-600 mb-4">Page not found</p>
+            <button
+              onClick={() => navigate("/")}
+              className="text-blue-500 hover:underline"
+            >
+              Go back home
+            </button>
+          </div>
+        </div>
+      ) : (
+        Component && <Component />
+      )}
+    </div>
+  );
 };
 
 export default PageRender;

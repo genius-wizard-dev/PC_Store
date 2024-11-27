@@ -1,17 +1,33 @@
 import { useToast } from "@/hooks/use-toast";
 import MainLayout from "@/layouts/MainLayout";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import PageRender from "./config/routers/PageRender";
-import { Home, Login, Register } from "./pages";
+
 import { clearAuth } from "./redux/slices/auth";
 import { RootState } from "./redux/store";
 import { checkTokenValid } from "./redux/thunks/auth";
 import { getCartCount } from "./redux/thunks/cart";
 import { viewOrder } from "./redux/thunks/order";
 import { getUserInfo } from "./redux/thunks/user";
+
+const Home = React.lazy(() => import("./pages/Home"));
+const Login = React.lazy(() => import("./pages/Login"));
+const Register = React.lazy(() => import("./pages/Register"));
+
+const LoadingComponent = () => (
+  <div className="flex flex-col justify-center items-center h-screen bg-gray-100">
+    <Loader2 className="h-12 w-12 animate-spin text-orange-500 mb-4" />
+    <div className="text-lg font-semibold text-gray-700 animate-pulse">
+      Đang tải...
+    </div>
+    <div className="mt-2 text-sm text-gray-500 animate-fade-in">
+      Vui lòng chờ trong giây lát
+    </div>
+  </div>
+);
 
 function App() {
   const { isLogin, token } = useSelector((state: RootState) => state.auth);
@@ -76,21 +92,23 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route
-          path="/login"
-          element={isLogin ? <Navigate to="/" replace /> : <Login />}
-        />
-        <Route
-          path="/register"
-          element={isLogin ? <Navigate to="/" replace /> : <Register />}
-        />
-        <Route path="/" element={<MainLayout />}>
-          <Route index element={<Home />} />
-          <Route path="/:page" element={<PageRender />} />
-          <Route path="/:page/:id" element={<PageRender />} />
-        </Route>
-      </Routes>
+      <Suspense fallback={<LoadingComponent />}>
+        <Routes>
+          <Route
+            path="/login"
+            element={isLogin ? <Navigate to="/" replace /> : <Login />}
+          />
+          <Route
+            path="/register"
+            element={isLogin ? <Navigate to="/" replace /> : <Register />}
+          />
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<Home />} />
+            <Route path="/:page" element={<PageRender />} />
+            <Route path="/:page/:id" element={<PageRender />} />
+          </Route>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }
