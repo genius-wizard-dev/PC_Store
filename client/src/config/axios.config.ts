@@ -4,11 +4,7 @@ import axios, { AxiosError } from 'axios';
 // Tạo instance axios với các cấu hình mặc định
 const instance = axios.create({
     baseURL: import.meta.env.VITE_API_URL || '',
-    withCredentials: false,
-    headers: {
-        "ngrok-skip-browser-warning": "true",
-        "Content-Type": "application/json"
-    }
+
 });
 
 // Xử lý interceptor cho response

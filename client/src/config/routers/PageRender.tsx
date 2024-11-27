@@ -3,7 +3,11 @@ import { RootState } from "@/redux/store";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-const pages: any = import.meta.glob("../../pages/**/*.tsx");
+
+const pages: any = import.meta.glob([
+  "../../pages/**/*.tsx",
+  "!../../pages/common/**",
+]);
 
 const PUBLIC_PAGES = [
   "Login",
