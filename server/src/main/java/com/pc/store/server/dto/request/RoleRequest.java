@@ -1,14 +1,15 @@
-package com.pc.store.server.entities;
+package com.pc.store.server.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CartItem {
-    Product product;
-    int quantity;
+public class RoleRequest {
+    String name;
+    String description;
+    String userName;
 }

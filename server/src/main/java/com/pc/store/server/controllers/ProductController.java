@@ -1,7 +1,5 @@
 package com.pc.store.server.controllers;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,10 +38,12 @@ public class ProductController {
     }
 
     @GetMapping("{name}")
-    public ApiResponse<Page<Product>> getProductByName(@PathVariable String name,@RequestParam(defaultValue = "0") int page) {
-        var products = productService.getProductByName(name,page,size);
+    public ApiResponse<Page<Product>> getProductByName(
+            @PathVariable String name, @RequestParam(defaultValue = "0") int page) {
+        var products = productService.getProductByName(name, page, size);
         return ApiResponse.<Page<Product>>builder().result(products).build();
     }
+
     @GetMapping("/id")
     public ApiResponse<ProductResponse> getProductById(@RequestParam String id) {
         var product = productService.getProductById(id);

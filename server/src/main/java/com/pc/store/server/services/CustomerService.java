@@ -10,9 +10,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.pc.store.server.dao.CustomerRepository;
+import com.pc.store.server.dao.RoleRepository;
 import com.pc.store.server.dto.request.CustomerCreationResquest;
 import com.pc.store.server.dto.response.CustomerResponse;
 import com.pc.store.server.entities.Customer;
+import com.pc.store.server.entities.Role;
 import com.pc.store.server.exception.AppException;
 import com.pc.store.server.exception.ErrorCode;
 import com.pc.store.server.mapper.CustomerMapper;
@@ -28,15 +30,16 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomerService {
 
-    final CustomerRepository customerRespository;
+    final CustomerRepository customerRepository;
     final MongoTemplate mongoTemplate;
     final PasswordEncoder passwordEncoder;
     final CustomerMapper customerMapper;
+    final RoleRepository roleRepository;
 
     public CustomerResponse createCustomer(CustomerCreationResquest customerCreationResquest) {
         synchronized (this) {
             Query query = new Query();
-            query.addCriteria(Criteria.where("useName").is(customerCreationResquest.getUserName()));
+            query.addCriteria(Criteria.where("userName").is(customerCreationResquest.getUserName()));
             if (mongoTemplate.exists(query, Customer.class)) {
                 throw new AppException(ErrorCode.CUSTOMER_EXISTED);
             }
@@ -52,12 +55,23 @@ public class CustomerService {
                     update,
                     FindAndModifyOptions.options().returnNew(true).upsert(true),
                     Customer.class);
+            assert customer != null;
+            updateRoleForUser(customer.getUserName(), "USER");
             return customerMapper.toCustomerResponse(customer);
         }
     }
 
+    public void updateRoleForUser(String userName, String roleName) {
+        Role role = roleRepository.findById(roleName).orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+        mongoTemplate
+                .update(Customer.class)
+                .matching(Criteria.where("userName").is(userName).and("roles").nin(role))
+                .apply(new Update().push("roles").value(role))
+                .first();
+    }
+
     public CustomerResponse getCustomer(String userName) {
-        Customer customer = customerRespository
+        Customer customer = customerRepository
                 .findByUserName(userName)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_NOT_FOUND));
         log.info("UserName:{}", customer.getUserName());
@@ -68,7 +82,7 @@ public class CustomerService {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
         log.info(name);
-        Customer customer = customerRespository
+        Customer customer = customerRepository
                 .findByUserName(name)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_NOT_FOUND));
         return customerMapper.toCustomerResponse(customer);

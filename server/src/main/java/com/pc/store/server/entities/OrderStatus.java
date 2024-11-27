@@ -8,9 +8,8 @@ public enum OrderStatus {
     DELIVERED("Đã giao hàng"),
     CANCELLED("Đã hủy");
     private final String status;
-    OrderStatus(String  status){
+
+    OrderStatus(String status) {
         this.status = status;
     }
-
-
 }

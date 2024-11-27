@@ -1,9 +1,5 @@
 package com.pc.store.server.services;
 
-import java.util.List;
-
-import com.pc.store.server.exception.AppException;
-import com.pc.store.server.exception.ErrorCode;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +10,8 @@ import org.springframework.stereotype.Service;
 import com.pc.store.server.dao.ProductRepository;
 import com.pc.store.server.dto.response.ProductResponse;
 import com.pc.store.server.entities.Product;
+import com.pc.store.server.exception.AppException;
+import com.pc.store.server.exception.ErrorCode;
 import com.pc.store.server.mapper.ProductMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -24,32 +22,43 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor
 public class ProductService {
 
-    ProductRepository productRespository;
+    ProductRepository productRepository;
     ProductMapper productMapper;
 
     public Page<Product> getProductsByPage(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return productRespository.findAllBy(pageable);
+        return productRepository.findAllBy(pageable);
     }
 
     public Page<Product> getProductsByPageAsc(int page, int size) {
         Pageable pageable =
                 PageRequest.of(page, size, Sort.by("priceAfterDiscount").ascending());
-        return productRespository.findAllBy(pageable);
+        return productRepository.findAllBy(pageable);
     }
 
     public Page<Product> getProductsByPageDesc(int page, int size) {
         Pageable pageable =
                 PageRequest.of(page, size, Sort.by("priceAfterDiscount").descending());
-        return productRespository.findAllBy(pageable);
+        return productRepository.findAllBy(pageable);
     }
 
     public Page<Product> getProductByName(String name, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return productRespository.findByNameContaining(name, pageable);
+        return productRepository.findByNameContaining(name, pageable);
     }
+
     public ProductResponse getProductById(String id) {
-        Product product = productRespository.findById(new ObjectId(id)).orElseThrow(()-> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        Product product = productRepository
+                .findById(new ObjectId(id))
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         return productMapper.toProductResponse(product);
+    }
+
+    public boolean updateInStockProduct(ObjectId productId, int quantity) {
+        Product product =
+                productRepository.findById(productId).orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        product.setInStock(product.getInStock() - quantity);
+        productRepository.save(product);
+        return true;
     }
 }
