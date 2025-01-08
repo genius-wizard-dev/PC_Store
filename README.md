@@ -1,4 +1,4 @@
-# PC Store Project 1
+# PC Store Project
 
 ## Introduction
 
