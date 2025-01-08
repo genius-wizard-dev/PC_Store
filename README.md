@@ -1,4 +1,4 @@
-# PC Store Project New Version
+# PC Store Project
 
 ## Introduction
 
